@@ -1,17 +1,15 @@
 [package]
-name = "cw721-rate-limited-proxy"
-license = "BSD-3"
+name = "cw721-proxy-tester"
+version = "0.0.1"
 authors = ["ekez <ekez@withoutdoing.com>"]
 edition = "2021"
-version = "0.0.1"
+description = "a contract for testing cw721 proxy implementations"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
 
 [features]
-# for more explicit tests, cargo test --features=backtraces
 backtraces = ["cosmwasm-std/backtraces"]
-# use library feature to disable all instantiate/execute/query exports
 library = []
 
 [dependencies]
@@ -22,12 +20,5 @@ cw2 = "0.15.0"
 cw721 = "0.15.0"
 cw721-proxy = { path = "../../packages/cw721-proxy", version = "*" }
 cw721-proxy-derive = { path = "../../packages/cw721-proxy-derive", version = "*" }
-cw-rate-limiter = { path = "../../packages/cw-rate-limiter", version = "*" }
 thiserror = { version = "1" }
-
-[dev-dependencies]
 cw-multi-test = "0.15.0"
-cw721-base = "0.15.0"
-cw721-proxy-tester = { path = "../../debug/cw721-proxy-tester", version = "*" }
-rand = "0.8"
-anyhow = "1"

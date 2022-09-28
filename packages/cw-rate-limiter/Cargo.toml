@@ -9,4 +9,6 @@ version = "0.0.1"
 cosmwasm-std = "1.1.1"
 cosmwasm-schema = "1.1.1"
 cw-storage-plus = "0.15.0"
-thiserror = { version = "1" }
+thiserror = "1"
+schemars = "0.8.1"
+serde = "1.0"

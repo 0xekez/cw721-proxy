@@ -23,18 +23,24 @@ pub fn instantiate(
     msg: InstantiateMsg,
 ) -> Result<Response, ContractError> {
     set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
-    ORIGIN.save(deps.storage, &info.sender)?;
+    ORIGIN.save(
+        deps.storage,
+        &msg.origin
+            .map(|a| deps.api.addr_validate(&a))
+            .transpose()?
+            .unwrap_or(info.sender),
+    )?;
     let (rate, units) = match msg.rate_limit {
         Rate::PerBlock(rate) => (rate, "nfts_per_block"),
         Rate::Blocks(rate) => (rate, "blocks_per_nft"),
     };
-    if rate.is_zero() {
+    if rate == 0 {
         Err(ContractError::ZeroRate {})
     } else {
         RATE_LIMIT.init(deps.storage, &msg.rate_limit)?;
         Ok(Response::default()
             .add_attribute("method", "instantiate")
-            .add_attribute("rate", rate)
+            .add_attribute("rate", rate.to_string())
             .add_attribute("units", units))
     }
 }
@@ -74,6 +80,3 @@ pub fn query(_deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
         QueryMsg::RateLimit {} => todo!(),
     }
 }
-
-#[cfg(test)]
-mod tests {}

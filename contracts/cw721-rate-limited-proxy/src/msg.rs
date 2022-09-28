@@ -5,6 +5,7 @@ use cw_rate_limiter::Rate;
 #[cw_serde]
 pub struct InstantiateMsg {
     pub rate_limit: Rate,
+    pub origin: Option<String>,
 }
 
 #[cw_serde]
