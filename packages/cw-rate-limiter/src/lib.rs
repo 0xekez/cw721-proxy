@@ -19,15 +19,15 @@ pub enum Rate {
 pub struct RateLimiter {
     rate_limit: Item<'static, Rate>,
     last_updated_height: Item<'static, u64>,
-    nfts_this_block: Item<'static, u64>,
+    this_block: Item<'static, u64>,
 }
 
-#[derive(Error, Debug)]
+#[derive(Error, Debug, PartialEq)]
 pub enum RateLimitError {
     #[error(transparent)]
     Std(#[from] StdError),
 
-    #[error("rate limited. try agan in {blocks_remaining}")]
+    #[error("rate limited. blocks until next chance: ({blocks_remaining})")]
     Limited { blocks_remaining: u64 },
 }
 
@@ -40,7 +40,7 @@ impl RateLimiter {
         Self {
             rate_limit: Item::new(rate_limit_key),
             last_updated_height: Item::new(last_updated_key),
-            nfts_this_block: Item::new(this_block_key),
+            this_block: Item::new(this_block_key),
         }
     }
 
@@ -54,7 +54,7 @@ impl RateLimiter {
         match self.rate_limit.load(storage)? {
             Rate::PerBlock(limit) => {
                 let nfts_this_block = if last_updated == env.block.height {
-                    self.nfts_this_block.load(storage)? + 1
+                    self.this_block.load(storage)? + 1
                 } else {
                     1
                 };
@@ -64,7 +64,7 @@ impl RateLimiter {
                         blocks_remaining: 1,
                     });
                 }
-                self.nfts_this_block.save(storage, &nfts_this_block)?;
+                self.this_block.save(storage, &nfts_this_block)?;
             }
             Rate::Blocks(min_blocks) => {
                 let elapsed = env.block.height.saturating_sub(last_updated);
@@ -77,6 +77,26 @@ impl RateLimiter {
         }
         self.last_updated_height.save(storage, &env.block.height)?;
         Ok(())
+    }
+
+    pub fn query_limit(&self, storage: &dyn Storage) -> Result<Rate, StdError> {
+        self.rate_limit.load(storage)
+    }
+}
+
+impl Rate {
+    pub fn is_zero(self) -> bool {
+        match self {
+            Self::Blocks(_) => false,
+            Self::PerBlock(limit) => limit == 0,
+        }
+    }
+
+    pub fn is_infinite(self) -> bool {
+        match self {
+            Self::Blocks(blocks) => blocks == 0,
+            Self::PerBlock(_) => false,
+        }
     }
 }
 
@@ -96,11 +116,11 @@ impl Eq for Rate {}
 impl Ord for Rate {
     fn cmp(&self, other: &Self) -> Ordering {
         match (self, other) {
-            (Rate::PerBlock(l), Rate::PerBlock(r)) => l.cmp(&r),
+            (Rate::PerBlock(l), Rate::PerBlock(r)) => l.cmp(r),
             (Rate::PerBlock(l), Rate::Blocks(r)) => {
-                if (*l == 1 || *l == 0) && l == r {
+                if *l == 1 && l == r {
                     Ordering::Equal
-                } else if *r == 0 {
+                } else if *r == 0 || *l == 0 {
                     Ordering::Less
                 } else {
                     Ordering::Greater
@@ -117,12 +137,28 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_partial_cmp() {
+    fn test_cmp() {
         assert_eq!(Rate::PerBlock(1), Rate::Blocks(1));
-        assert_eq!(Rate::PerBlock(0), Rate::Blocks(0));
+        assert_ne!(Rate::PerBlock(0), Rate::Blocks(0));
         assert!(Rate::PerBlock(2) > Rate::Blocks(1));
         assert!(Rate::Blocks(2) < Rate::Blocks(1));
         assert!(Rate::PerBlock(2) > Rate::PerBlock(1));
         assert!(Rate::PerBlock(2) > Rate::Blocks(1));
+    }
+
+    #[test]
+    fn test_infinity() {
+        let infinity = Rate::Blocks(0);
+        // bitwise not. largest possible u64.
+        assert!(Rate::PerBlock(!0) < infinity);
+        assert!(infinity.is_infinite());
+        assert!(!Rate::PerBlock(!0).is_infinite());
+    }
+
+    #[test]
+    fn test_zero() {
+        let zero = Rate::PerBlock(0);
+        assert!(zero.is_zero());
+        assert!(zero < Rate::Blocks(!0));
     }
 }

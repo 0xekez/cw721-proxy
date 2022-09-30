@@ -30,13 +30,13 @@ pub fn instantiate(
             .transpose()?
             .unwrap_or(info.sender),
     )?;
-    let (rate, units) = match msg.rate_limit {
-        Rate::PerBlock(rate) => (rate, "nfts_per_block"),
-        Rate::Blocks(rate) => (rate, "blocks_per_nft"),
-    };
-    if rate == 0 {
+    if msg.rate_limit.is_zero() {
         Err(ContractError::ZeroRate {})
     } else {
+        let (rate, units) = match msg.rate_limit {
+            Rate::PerBlock(rate) => (rate, "nfts_per_block"),
+            Rate::Blocks(rate) => (rate, "blocks_per_nft"),
+        };
         RATE_LIMIT.init(deps.storage, &msg.rate_limit)?;
         Ok(Response::default()
             .add_attribute("method", "instantiate")
@@ -75,8 +75,9 @@ pub fn execute_receive_nft(
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
-pub fn query(_deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
+pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
-        QueryMsg::RateLimit {} => todo!(),
+        QueryMsg::RateLimit {} => to_binary(&RATE_LIMIT.query_limit(deps.storage)?),
+        QueryMsg::Origin {} => to_binary(&ORIGIN.load(deps.storage)?),
     }
 }

@@ -4,9 +4,3 @@ pub mod msg;
 pub mod state;
 
 pub use crate::error::ContractError;
-
-impl Default for crate::msg::InstantiateMsg {
-    fn default() -> Self {
-        Self {}
-    }
-}

@@ -19,4 +19,7 @@ pub enum QueryMsg {
     /// Gets the contract's rate limit.
     #[returns(Rate)]
     RateLimit {},
+
+    #[returns(String)]
+    Origin {},
 }

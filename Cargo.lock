@@ -309,6 +309,7 @@ dependencies = [
 name = "cw721-proxy-derive"
 version = "0.0.1"
 dependencies = [
+ "cw721",
  "proc-macro2",
  "quote",
  "syn",

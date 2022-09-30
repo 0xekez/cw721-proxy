@@ -1,9 +1,11 @@
 use cosmwasm_std::{to_binary, Addr, Empty};
-use cw721_base::MintMsg;
 use cw_multi_test::{next_block, App, Contract, ContractWrapper, Executor};
-use cw_rate_limiter::Rate;
+use cw_rate_limiter::{Rate, RateLimitError};
 
-use crate::msg::InstantiateMsg;
+use crate::{
+    error::ContractError,
+    msg::{InstantiateMsg, QueryMsg},
+};
 
 struct Test {
     pub app: App,
@@ -11,7 +13,9 @@ struct Test {
     pub minter: Addr,
     pub rate_limiter: Addr,
     pub mock_receiver: Addr,
+
     nfts_minted: usize,
+    rate_limiter_id: u64,
 }
 
 impl Test {
@@ -71,7 +75,21 @@ impl Test {
             rate_limiter,
             mock_receiver,
             nfts_minted: 0,
+            rate_limiter_id,
         }
+    }
+
+    pub fn update_rate(&mut self, rate: Rate) -> Result<(), anyhow::Error> {
+        self.app
+            .instantiate_contract(
+                self.rate_limiter_id,
+                self.minter.clone(),
+                &InstantiateMsg::new(rate, Some(self.mock_receiver.to_string())),
+                &[],
+                "rate_limiter",
+                None,
+            )
+            .map(|rate_limiter| self.rate_limiter = rate_limiter)
     }
 
     pub fn send_nft_and_check_received(&mut self, nft: Addr) -> Result<(), anyhow::Error> {
@@ -80,7 +98,7 @@ impl Test {
         self.app.execute_contract(
             self.minter.clone(),
             nft.clone(),
-            &cw721_base::msg::ExecuteMsg::<Empty, Empty>::Mint(MintMsg::<Empty> {
+            &cw721_base::msg::ExecuteMsg::<Empty, Empty>::Mint(cw721_base::MintMsg::<Empty> {
                 token_id: self.nfts_minted.to_string(),
                 owner: self.minter.to_string(),
                 token_uri: None,
@@ -191,10 +209,10 @@ fn random_rate<R: rand::Rng, S: rand::distributions::uniform::SampleRange<u64>>(
     range: S,
 ) -> Rate {
     let t = rng.gen();
-    let v = rng.gen_range(range);
+    let v = rng.gen_range(range) + 1u64;
     match t {
         true => Rate::Blocks(v),
-        false => Rate::PerBlock(v),
+        false => Rate::PerBlock(v + 1),
     }
 }
 
@@ -206,7 +224,7 @@ fn simple_send() {
 }
 
 #[test]
-fn test_simple() {
+fn test_simple_not_limited() {
     let rng = &mut rand::thread_rng();
     let expected = Rate::PerBlock(2);
     let actual = Rate::Blocks(1);
@@ -215,9 +233,28 @@ fn test_simple() {
 }
 
 #[test]
+fn test_simple_rate_limited() {
+    let rng = &mut rand::thread_rng();
+    let actual = Rate::PerBlock(2);
+    let expected = Rate::Blocks(4);
+    let mut test = Test::new(10, expected);
+    let err: ContractError = test
+        .send_nfts_at_rate(rng, actual, 1)
+        .unwrap_err()
+        .downcast()
+        .unwrap();
+    assert_eq!(
+        err,
+        ContractError::Rate(RateLimitError::Limited {
+            blocks_remaining: 4
+        })
+    )
+}
+
+#[test]
 fn fuzz_rate_limiting() {
-    let iterations = 500;
-    let max = 5;
+    let iterations = 200;
+    let max = 15;
     let range = 1..max;
     let rng = &mut rand::thread_rng();
 
@@ -226,6 +263,9 @@ fn fuzz_rate_limiting() {
 
     for _ in 0..iterations {
         let actual = random_rate(rng, range.clone());
+        let limit = random_rate(rng, range.clone());
+        test.update_rate(limit).unwrap();
+
         let res = test.send_nfts_at_rate(rng, actual, max as usize);
         let pass = match actual > limit {
             true => res.is_err(),
@@ -245,4 +285,111 @@ fn fuzz_rate_limiting() {
             test.app.update_block(next_block)
         }
     }
+}
+
+#[test]
+fn test_origin_instantiator() {
+    let mut app = App::default();
+    let rate_limiter_id = app.store_code(cw721_rate_limiter());
+
+    // Check that origin is set to instantiator if origin is None
+    // during instantiation.
+    let rate_limiter = app
+        .instantiate_contract(
+            rate_limiter_id,
+            Addr::unchecked("ekez"),
+            &InstantiateMsg {
+                rate_limit: Rate::Blocks(20),
+                origin: None,
+            },
+            &[],
+            "rate limiter",
+            None,
+        )
+        .unwrap();
+
+    let origin: Addr = app
+        .wrap()
+        .query_wasm_smart(&rate_limiter, &QueryMsg::Origin {})
+        .unwrap();
+    assert_eq!(origin, Addr::unchecked("ekez"));
+
+    let rate: Rate = app
+        .wrap()
+        .query_wasm_smart(&rate_limiter, &QueryMsg::RateLimit {})
+        .unwrap();
+    assert_eq!(rate, Rate::Blocks(20))
+}
+
+#[test]
+fn test_origin_specified() {
+    let mut app = App::default();
+    let rate_limiter_id = app.store_code(cw721_rate_limiter());
+
+    // Check that origin is set to instantiator if origin is None
+    // during instantiation.
+    let rate_limiter = app
+        .instantiate_contract(
+            rate_limiter_id,
+            Addr::unchecked("zeke"),
+            &InstantiateMsg {
+                rate_limit: Rate::PerBlock(20),
+                origin: Some("ekez".to_string()),
+            },
+            &[],
+            "rate limiter",
+            None,
+        )
+        .unwrap();
+
+    let origin: Addr = app
+        .wrap()
+        .query_wasm_smart(&rate_limiter, &QueryMsg::Origin {})
+        .unwrap();
+    assert_eq!(origin, Addr::unchecked("ekez"));
+
+    let rate: Rate = app
+        .wrap()
+        .query_wasm_smart(&rate_limiter, &QueryMsg::RateLimit {})
+        .unwrap();
+    assert_eq!(rate, Rate::PerBlock(20))
+}
+
+#[test]
+fn test_zero_rate_instantiate() {
+    let mut app = App::default();
+    let rate_limiter_id = app.store_code(cw721_rate_limiter());
+
+    let err: ContractError = app
+        .instantiate_contract(
+            rate_limiter_id,
+            Addr::unchecked("zeke"),
+            &InstantiateMsg {
+                rate_limit: Rate::PerBlock(0),
+                origin: Some("ekez".to_string()),
+            },
+            &[],
+            "rate limiter",
+            None,
+        )
+        .unwrap_err()
+        .downcast()
+        .unwrap();
+    assert_eq!(err, ContractError::ZeroRate {});
+
+    let infinity = Rate::Blocks(0);
+    assert!(infinity.is_infinite());
+
+    app.instantiate_contract(
+        rate_limiter_id,
+        Addr::unchecked("zeke"),
+        &InstantiateMsg {
+            rate_limit: infinity,
+            origin: Some("ekez".to_string()),
+        },
+        &[],
+        "rate limiter",
+        None,
+    )
+    .unwrap();
 }

@@ -59,7 +59,7 @@ pub fn cw721_proxy(metadata: TokenStream, input: TokenStream) -> TokenStream {
             let receive: Variant = syn::parse2(quote! {
                 ReceiveProxyNft {
                     eyeball: String,
-                    msg: cw721::Cw721ReceiveMsg,
+                    msg: ::cw721::Cw721ReceiveMsg,
                 }
             })
             .unwrap();

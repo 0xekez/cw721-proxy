@@ -12,3 +12,4 @@ proc-macro = true
 syn = { version = "1.0", features = ["derive"] }
 quote = "1.0"
 proc-macro2 = "1.0"
+cw721 = "0.15"
