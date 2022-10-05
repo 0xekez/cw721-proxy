@@ -139,27 +139,23 @@ impl Test {
         Ok(())
     }
 
-    pub fn send_nfts_at_rate<R: rand::Rng>(
+    pub fn send_nfts_at_rate(
         &mut self,
-        rng: &mut R,
+        cw721: Addr,
         rate: Rate,
         for_blocks: usize,
     ) -> Result<(), anyhow::Error> {
-        use rand::seq::SliceRandom;
-
         let start_block = self.app.block_info().height;
         for _ in 0..for_blocks {
             match rate {
                 Rate::PerBlock(n) => {
                     for _ in 0..n {
-                        let nft = self.cw721s.choose(rng).unwrap().clone();
-                        self.send_nft_and_check_received(nft)?;
+                        self.send_nft_and_check_received(cw721.clone())?;
                     }
                 }
                 Rate::Blocks(b) => {
                     if (self.app.block_info().height - start_block) % b == 0 {
-                        let nft = self.cw721s.choose(rng).unwrap().clone();
-                        self.send_nft_and_check_received(nft)?;
+                        self.send_nft_and_check_received(cw721.clone())?;
                     }
                 }
             }
@@ -225,30 +221,76 @@ fn simple_send() {
 
 #[test]
 fn test_simple_not_limited() {
-    let rng = &mut rand::thread_rng();
     let expected = Rate::PerBlock(2);
     let actual = Rate::Blocks(1);
-    let mut test = Test::new(10, expected);
-    test.send_nfts_at_rate(rng, actual, 1).unwrap();
+    let mut test = Test::new(1, expected);
+    test.send_nfts_at_rate(test.cw721s[0].clone(), actual, 1)
+        .unwrap();
 }
 
 #[test]
 fn test_simple_rate_limited() {
-    let rng = &mut rand::thread_rng();
     let actual = Rate::PerBlock(2);
     let expected = Rate::Blocks(4);
-    let mut test = Test::new(10, expected);
+    let mut test = Test::new(1, expected);
     let err: ContractError = test
-        .send_nfts_at_rate(rng, actual, 1)
+        .send_nfts_at_rate(test.cw721s[0].clone(), actual, 1)
         .unwrap_err()
         .downcast()
         .unwrap();
     assert_eq!(
         err,
         ContractError::Rate(RateLimitError::Limited {
-            blocks_remaining: 4
+            blocks_remaining: 4,
+            key: test.cw721s[0].to_string(),
         })
     )
+}
+
+#[test]
+fn test_multikey_rate_limit() {
+    let rate_limit = Rate::PerBlock(2);
+    let mut test = Test::new(2, rate_limit);
+
+    test.send_nft_and_check_received(test.cw721s[0].clone())
+        .unwrap();
+    test.send_nft_and_check_received(test.cw721s[0].clone())
+        .unwrap();
+    test.send_nft_and_check_received(test.cw721s[1].clone())
+        .unwrap();
+    let err: ContractError = test
+        .send_nft_and_check_received(test.cw721s[0].clone())
+        .unwrap_err()
+        .downcast()
+        .unwrap();
+    assert_eq!(
+        err,
+        ContractError::Rate(RateLimitError::Limited {
+            key: test.cw721s[0].to_string(),
+            blocks_remaining: 1
+        })
+    );
+    test.send_nft_and_check_received(test.cw721s[1].clone())
+        .unwrap();
+    let err: ContractError = test
+        .send_nft_and_check_received(test.cw721s[1].clone())
+        .unwrap_err()
+        .downcast()
+        .unwrap();
+    assert_eq!(
+        err,
+        ContractError::Rate(RateLimitError::Limited {
+            key: test.cw721s[1].to_string(),
+            blocks_remaining: 1
+        })
+    );
+
+    test.app.update_block(next_block);
+
+    test.send_nfts_at_rate(test.cw721s[0].clone(), rate_limit, 1)
+        .unwrap();
+    test.send_nfts_at_rate(test.cw721s[1].clone(), rate_limit, 1)
+        .unwrap();
 }
 
 #[test]
@@ -259,14 +301,14 @@ fn fuzz_rate_limiting() {
     let rng = &mut rand::thread_rng();
 
     let limit = random_rate(rng, range.clone());
-    let mut test = Test::new(max as usize, limit);
+    let mut test = Test::new(1, limit);
 
     for _ in 0..iterations {
         let actual = random_rate(rng, range.clone());
         let limit = random_rate(rng, range.clone());
         test.update_rate(limit).unwrap();
 
-        let res = test.send_nfts_at_rate(rng, actual, max as usize);
+        let res = test.send_nfts_at_rate(test.cw721s[0].clone(), actual, max as usize);
         let pass = match actual > limit {
             true => res.is_err(),
             false => res.is_ok(),

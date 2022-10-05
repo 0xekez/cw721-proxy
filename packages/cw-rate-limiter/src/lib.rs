@@ -1,10 +1,11 @@
 use std::cmp::Ordering;
 
+use cosmwasm_schema::cw_serde;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use cosmwasm_std::{Env, StdError, StdResult, Storage};
-use cw_storage_plus::Item;
+use cw_storage_plus::{Item, Map};
 use thiserror::Error;
 
 // Need to derive ourselves instead of cw_serde as we have a custom
@@ -16,10 +17,16 @@ pub enum Rate {
     Blocks(u64),
 }
 
-pub struct RateLimiter {
-    rate_limit: Item<'static, Rate>,
-    last_updated_height: Item<'static, u64>,
-    this_block: Item<'static, u64>,
+#[cw_serde]
+#[derive(Default)]
+struct RateInfo {
+    last_updated_height: u64,
+    this_block: u64,
+}
+
+pub struct RateLimiter<'a, 'b> {
+    rate_limit: Item<'a, Rate>,
+    rates: Map<'a, &'b str, RateInfo>,
 }
 
 #[derive(Error, Debug, PartialEq)]
@@ -27,55 +34,67 @@ pub enum RateLimitError {
     #[error(transparent)]
     Std(#[from] StdError),
 
-    #[error("rate limited. blocks until next chance: ({blocks_remaining})")]
-    Limited { blocks_remaining: u64 },
+    #[error("rate limit reached for key ({key}). blocks until next chance: ({blocks_remaining})")]
+    Limited { key: String, blocks_remaining: u64 },
 }
 
-impl RateLimiter {
-    pub const fn new(
-        rate_limit_key: &'static str,
-        last_updated_key: &'static str,
-        this_block_key: &'static str,
-    ) -> Self {
+impl<'a> RateLimiter<'a, '_> {
+    pub const fn new(rate_limit_key: &'a str, rates_key: &'a str) -> Self {
         Self {
             rate_limit: Item::new(rate_limit_key),
-            last_updated_height: Item::new(last_updated_key),
-            this_block: Item::new(this_block_key),
+            rates: Map::new(rates_key),
         }
     }
 
     pub fn init(&self, storage: &mut dyn Storage, rate_limit: &Rate) -> StdResult<()> {
-        self.rate_limit.save(storage, rate_limit)?;
-        self.last_updated_height.save(storage, &0)
+        self.rate_limit.save(storage, rate_limit)
     }
 
-    pub fn limit(&self, storage: &mut dyn Storage, env: &Env) -> Result<(), RateLimitError> {
-        let last_updated = self.last_updated_height.load(storage)?;
-        match self.rate_limit.load(storage)? {
+    pub fn limit(
+        &self,
+        storage: &mut dyn Storage,
+        env: &Env,
+        key: &str,
+    ) -> Result<(), RateLimitError> {
+        let RateInfo {
+            last_updated_height,
+            this_block,
+        } = self.rates.may_load(storage, key)?.unwrap_or_default();
+        let next_value = match self.rate_limit.load(storage)? {
             Rate::PerBlock(limit) => {
-                let nfts_this_block = if last_updated == env.block.height {
-                    self.this_block.load(storage)? + 1
+                let this_block = if last_updated_height == env.block.height {
+                    this_block + 1
                 } else {
                     1
                 };
 
-                if nfts_this_block > limit {
+                if this_block > limit {
                     return Err(RateLimitError::Limited {
                         blocks_remaining: 1,
+                        key: key.to_string(),
                     });
                 }
-                self.this_block.save(storage, &nfts_this_block)?;
+                this_block
             }
             Rate::Blocks(min_blocks) => {
-                let elapsed = env.block.height.saturating_sub(last_updated);
+                let elapsed = env.block.height.saturating_sub(last_updated_height);
                 if elapsed < min_blocks {
                     return Err(RateLimitError::Limited {
                         blocks_remaining: min_blocks - elapsed,
+                        key: key.to_string(),
                     });
                 }
+                0
             }
-        }
-        self.last_updated_height.save(storage, &env.block.height)?;
+        };
+        self.rates.save(
+            storage,
+            key,
+            &RateInfo {
+                last_updated_height: env.block.height,
+                this_block: next_value,
+            },
+        )?;
         Ok(())
     }
 
