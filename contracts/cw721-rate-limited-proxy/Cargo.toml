@@ -30,4 +30,4 @@ cw-multi-test = "0.15.0"
 cw721-base = "0.15.0"
 cw721-proxy-tester = { path = "../../debug/cw721-proxy-tester", version = "*" }
 rand = "0.8"
-anyhow = "1"
+anyhow = "1.0"

@@ -5,3 +5,5 @@ pub mod state;
 
 #[cfg(test)]
 mod tests;
+
+pub use cw_rate_limiter::{Rate, RateLimitError};
