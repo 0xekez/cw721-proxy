@@ -9,8 +9,8 @@ version = "0.0.1"
 cosmwasm-std = "1.1.1"
 cosmwasm-schema = "1.1.1"
 
-cw-storage-plus = "0.15.0"
-cw721 = "0.15.0"
+cw-storage-plus = "0.16"
+cw721 = "0.16"
 
 thiserror = { version = "1.0.31" }
 
