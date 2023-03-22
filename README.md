@@ -7,7 +7,9 @@
    contracts.
 4. `packages/cw721-proxy-derive` Procedural macros for deriving the
    proxy receiver message types on an existing enum.
-5. `contracts/cw721-sender-whitelist-proxy` A proxy with a (sender) whitelist
+5. `contracts/cw721-sender-whitelist-proxy` A proxy with a sender/cw721 whitelist
    being eligible to `send_nft`s to origin contract.
-6. `packages/cw721-whitelist` package for whitelisting in
+6. `contracts/cw721-channel-whitelist-proxy` A proxy with a channel whitelist
+   being eligible to `send_nft`s to origin contract.
+7. `packages/cw721-whitelist` package for whitelisting in
    CosmWasm contracts.
