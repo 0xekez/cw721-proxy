@@ -1,6 +1,6 @@
 [package]
 name = "cw721-sender-whitelist-proxy"
-authors = ["mr-t@arkprotocol.io"]
+authors = ["Mr T <mr-t@arkprotocol>"]
 edition = "2021"
 version = "0.0.1"
 
@@ -23,6 +23,7 @@ cw2 = "0.16"
 cw721 = "0.16"
 cw721-proxy = { path = "../../packages/cw721-proxy", version = "*" }
 cw721-proxy-derive = { path = "../../packages/cw721-proxy-derive", version = "*" }
+cw721-sender-whitelist = { path = "../../packages/cw721-sender-whitelist", version = "*" }
 thiserror = "1"
 
 [dev-dependencies]
