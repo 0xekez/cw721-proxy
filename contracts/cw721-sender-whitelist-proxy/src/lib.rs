@@ -6,4 +6,4 @@ pub mod error;
 #[cfg(test)]
 mod tests;
 
-pub use cw721_sender_whitelist::{WhiteList};
+pub use cw721_whitelist::{WhiteList};

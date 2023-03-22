@@ -1,5 +1,5 @@
 [package]
-name = "cw721-sender-whitelist"
+name = "cw721-whitelist"
 license = "BSD-3"
 authors = ["Mr T <mr-t@arkprotocol>"]
 edition = "2021"

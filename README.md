@@ -9,5 +9,5 @@
    proxy receiver message types on an existing enum.
 5. `contracts/cw721-sender-whitelist-proxy` A proxy with a (sender) whitelist
    being eligible to `send_nft`s to origin contract.
-6. `packages/cw721-sender-whitelist` package for whitelisting in
+6. `packages/cw721-whitelist` package for whitelisting in
    CosmWasm contracts.
