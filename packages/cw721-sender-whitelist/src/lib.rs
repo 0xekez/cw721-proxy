@@ -1,9 +1,9 @@
-use cosmwasm_std::{StdResult, Storage, Addr, DepsMut};
+use cosmwasm_std::{StdResult, Storage, DepsMut};
 use cw_storage_plus::{Item};
 
 
 pub struct WhiteList<'a> {
-    whitelist: Item<'a, Vec<Addr>>,
+    whitelist: Item<'a, Vec<String>>,
 }
 
 impl<'a> WhiteList<'a> {
@@ -17,37 +17,36 @@ impl<'a> WhiteList<'a> {
         let whitelist = whitelist
             .map_or(vec![], |wl| wl)
             .into_iter()
-            .map(|addr| deps.api.addr_validate(&addr).unwrap())
             .collect();
         self.whitelist.save(deps.storage, &whitelist)
     }
 
-    pub fn query_whitelist(&self, storage: &dyn Storage) -> StdResult<Vec<Addr>> {
+    pub fn query_whitelist(&self, storage: &dyn Storage) -> StdResult<Vec<String>> {
         self.whitelist.load(storage)
     }
 
-    pub fn query_is_whitelisted(&self, storage: &dyn Storage, addr: &Addr) -> StdResult<bool> {
+    pub fn query_is_whitelisted(&self, storage: &dyn Storage, value: &String) -> StdResult<bool> {
         let whitelist = self.query_whitelist(storage)?;
-        Ok(whitelist.contains(addr))
+        Ok(whitelist.contains(value))
     }
 
-    pub fn add(&self, storage: &mut dyn Storage, addr: &Addr) -> StdResult<()> {
+    pub fn add(&self, storage: &mut dyn Storage, value: &String) -> StdResult<()> {
         let mut whitelist = self.query_whitelist(storage)?;
-        match whitelist.contains(addr) {
+        match whitelist.contains(value) {
             true => Ok(()),
             false => {
-                whitelist.push(addr.clone());
+                whitelist.push(value.clone());
                 self.whitelist.save(storage, &whitelist)?;
                 Ok(())
             }
         }
     }
 
-    pub fn remove(&self, storage: &mut dyn Storage, addr: &Addr) -> StdResult<()> {
+    pub fn remove(&self, storage: &mut dyn Storage, value: &String) -> StdResult<()> {
         let mut whitelist = self.query_whitelist(storage)?;
-        match whitelist.contains(addr) {
+        match whitelist.contains(value) {
             true => {
-                whitelist.remove(whitelist.iter().position(|x| x == addr).unwrap());
+                whitelist.remove(whitelist.iter().position(|x| x == value).unwrap());
                 self.whitelist.save(storage, &whitelist)?;
                 Ok(())
             }

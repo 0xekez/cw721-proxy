@@ -74,7 +74,7 @@ pub fn execute_add_to_whitelist(
 ) -> Result<Response, ContractError> {
     is_owner(deps.storage, &info.sender)?;
     let addr = deps.api.addr_validate(addr)?;
-    WHITELIST.add(deps.storage, &addr)?;
+    WHITELIST.add(deps.storage, &addr.to_string())?;
     Ok(Response::default()
         .add_attribute("method", "execute_add_to_whitelist")
         .add_attribute("addr", addr)
@@ -89,7 +89,7 @@ pub fn execute_remove_from_whitelist(
 ) -> Result<Response, ContractError> {
     is_owner(deps.storage, &info.sender)?;
     let addr = deps.api.addr_validate(addr)?;
-    WHITELIST.remove(deps.storage, &addr)?;
+    WHITELIST.remove(deps.storage, &addr.to_string())?;
     Ok(Response::default()
         .add_attribute("method", "execute_remove_from_whitelist")
         .add_attribute("addr", addr)
@@ -102,7 +102,7 @@ pub fn execute_receive_nft(
     info: MessageInfo,
     msg: cw721::Cw721ReceiveMsg,
 ) -> Result<Response, ContractError> {
-    query_is_whitelisted(deps.storage, &info.sender)?;
+    query_is_whitelisted(deps.storage, &info.sender.to_string())?;
     Ok(Response::default().add_message(WasmMsg::Execute {
         contract_addr: ORIGIN.load(deps.storage)?.into_string(),
         msg: to_binary(&ProxyExecuteMsg::ReceiveProxyNft {
@@ -118,11 +118,11 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
         QueryMsg::Origin {} => to_binary(&ORIGIN.load(deps.storage)?),
         QueryMsg::Whitelist {} => to_binary(&WHITELIST.query_whitelist(deps.storage)?),
-        QueryMsg::WhiteListed(addr) => to_binary(&WHITELIST.query_is_whitelisted(deps.storage, &deps.api.addr_validate(&addr)?)?),
+        QueryMsg::WhiteListed(addr) => to_binary(&WHITELIST.query_is_whitelisted(deps.storage, &addr)?),
     }
 }
 
-pub fn query_is_whitelisted(storage: &dyn Storage, addr: &Addr) -> Result<(), ContractError> {
+pub fn query_is_whitelisted(storage: &dyn Storage, addr: &String) -> Result<(), ContractError> {
     match WHITELIST.query_is_whitelisted(storage, addr)? {
         true => Ok(()),
         false => Err(ContractError::Unauthorized { addr: addr.to_string() }),
