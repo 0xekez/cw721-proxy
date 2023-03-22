@@ -267,7 +267,7 @@ fn send_whitelisted() {
 }
 
 #[test]
-fn send_not_whitelist() {
+fn send_not_whitelisted() {
     let mut test = Test::new(1);
     let token_id = test.mint(test.cw721s[0].clone()).unwrap();
     let err: ContractError = test
