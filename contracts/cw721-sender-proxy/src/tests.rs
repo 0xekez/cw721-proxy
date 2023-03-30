@@ -239,7 +239,7 @@ fn add_to_whitelist_unauthorized() {
 }
 
 #[test]
-fn remove_whitelist_authorized() {
+fn remove_from_whitelist_authorized() {
     let mut test = Test::new(1);
     test.remove_from_whitelist(test.minter.clone(), "any".to_string())
         .unwrap();
