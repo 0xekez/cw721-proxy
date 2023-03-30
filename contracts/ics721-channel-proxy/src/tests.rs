@@ -275,7 +275,7 @@ fn remove_from_whitelist_unauthorized() {
 }
 
 #[test]
-fn send_authorized() {
+fn send_authorized_channel() {
     let mut test = Test::new(1);
     let channel_id = "governedchannel-123";
     test.add_to_whitelist(test.minter.clone(), channel_id.to_string())
@@ -304,7 +304,7 @@ fn send_authorized() {
 }
 
 #[test]
-fn send_unauthorized() {
+fn send_unauthorized_channel() {
     let mut test = Test::new(1);
     let token_id = test.mint(test.cw721s[0].clone()).unwrap();
     let channel_id = "ungovernedchannel-123";
@@ -315,8 +315,8 @@ fn send_unauthorized() {
         .unwrap();
     assert_eq!(
         err,
-        ContractError::Unauthorized {
-            addr: channel_id.to_string()
+        ContractError::UnauthorizedChannel {
+            channel: channel_id.to_string()
         }
     )
 }

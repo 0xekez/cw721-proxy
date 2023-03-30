@@ -8,4 +8,7 @@ pub enum ContractError {
 
     #[error("Unauthorized addr {addr}")]
     Unauthorized { addr: String },
+
+    #[error("Unauthorized channel {channel}")]
+    UnauthorizedChannel { channel: String },
 }

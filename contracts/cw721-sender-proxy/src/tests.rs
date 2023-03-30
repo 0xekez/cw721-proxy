@@ -262,7 +262,7 @@ fn remove_from_whitelist_unauthorized() {
 }
 
 #[test]
-fn send_authorized() {
+fn send_authorized_sender() {
     let mut test = Test::new(1);
     test.add_to_whitelist(test.minter.clone(), test.cw721s[0].to_string())
         .unwrap();
@@ -286,7 +286,7 @@ fn send_authorized() {
 }
 
 #[test]
-fn send_unauthorized() {
+fn send_unauthorized_sender() {
     let mut test = Test::new(1);
     let token_id = test.mint(test.cw721s[0].clone()).unwrap();
     let err: ContractError = test

@@ -131,11 +131,11 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     }
 }
 
-pub fn is_whitelisted(storage: &dyn Storage, addr: &String) -> Result<(), ContractError> {
-    match WHITELIST.query_is_whitelisted(storage, addr)? {
+pub fn is_whitelisted(storage: &dyn Storage, channel: &String) -> Result<(), ContractError> {
+    match WHITELIST.query_is_whitelisted(storage, channel)? {
         true => Ok(()),
-        false => Err(ContractError::Unauthorized {
-            addr: addr.to_string(),
+        false => Err(ContractError::UnauthorizedChannel {
+            channel: channel.to_string(),
         }),
     }
 }
