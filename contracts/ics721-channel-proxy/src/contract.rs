@@ -75,28 +75,26 @@ pub fn execute_add_to_whitelist(
     deps: DepsMut,
     _env: Env,
     info: MessageInfo,
-    addr: &str,
+    channel: &str,
 ) -> Result<Response, ContractError> {
     is_owner(deps.storage, &info.sender)?;
-    let addr = deps.api.addr_validate(addr)?;
-    WHITELIST.add(deps.storage, &addr.to_string())?;
+    WHITELIST.add(deps.storage, &channel.to_string())?;
     Ok(Response::default()
         .add_attribute("method", "execute_add_to_whitelist")
-        .add_attribute("addr", addr))
+        .add_attribute("channel", channel))
 }
 
 pub fn execute_remove_from_whitelist(
     deps: DepsMut,
     _env: Env,
     info: MessageInfo,
-    addr: &str,
+    channel: &str,
 ) -> Result<Response, ContractError> {
     is_owner(deps.storage, &info.sender)?;
-    let addr = deps.api.addr_validate(addr)?;
-    WHITELIST.remove(deps.storage, &addr.to_string())?;
+    WHITELIST.remove(deps.storage, &channel.to_string())?;
     Ok(Response::default()
         .add_attribute("method", "execute_remove_from_whitelist")
-        .add_attribute("addr", addr))
+        .add_attribute("channel", channel))
 }
 
 pub fn execute_receive_nft(
