@@ -16,6 +16,6 @@
 8. `contracts/ics721-channel-proxy` An ICS721 specific proxy with a channel whitelist
    being eligible to `send_nft`s to origin contract. Proxy expects to receive an
    [ICS721 IbcOutgoingMsg](https://github.com/public-awesome/ics721/blob/main/contracts/cw-ics721-bridge/src/msg.rs#L84-L95).
-9. `contracts/ics721-sender-channel-proxy` An ICS721 specific proxy with a sender and channels whitelist
+9. `contracts/ics721-sender-channels-proxy` An ICS721 specific proxy with a sender and channels whitelist
    being eligible to `send_nft`s to origin contract. Proxy expects to receive an
    [ICS721 IbcOutgoingMsg](https://github.com/public-awesome/ics721/blob/main/contracts/cw-ics721-bridge/src/msg.rs#L84-L95).

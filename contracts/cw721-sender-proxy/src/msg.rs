@@ -11,9 +11,13 @@ pub struct InstantiateMsg {
 pub enum ExecuteMsg {
     ReceiveNft(cw721::Cw721ReceiveMsg),
     /// Add CW721 contract to whitelist.
-    AddToWhitelist { sender: String },
+    AddToWhitelist {
+        sender: String,
+    },
     /// Add CW721 contract to whitelist.
-    RemoveFromWhitelist { sender: String },
+    RemoveFromWhitelist {
+        sender: String,
+    },
 }
 
 #[cw_serde]

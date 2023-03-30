@@ -689,7 +689,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "ics721-sender-channel-proxy"
+name = "ics721-sender-channels-proxy"
 version = "0.0.1"
 dependencies = [
  "anyhow",
