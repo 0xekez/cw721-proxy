@@ -376,6 +376,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "cw721-code-id-proxy"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw-multi-test 0.16.1",
+ "cw-storage-plus 0.16.0",
+ "cw2 0.16.0",
+ "cw721 0.16.0",
+ "cw721-base",
+ "cw721-proxy",
+ "cw721-proxy-derive",
+ "cw721-proxy-tester",
+ "cw721-whitelist",
+ "rand",
+ "thiserror",
+]
+
+[[package]]
 name = "cw721-proxy"
 version = "0.0.1"
 dependencies = [

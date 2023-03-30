@@ -1,0 +1,34 @@
+[package]
+name = "cw721-code-id-proxy"
+authors = ["Mr T <mr-t@arkprotocol>"]
+edition = "2021"
+version = "0.0.1"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+# for more explicit tests, cargo test --features=backtraces
+backtraces = ["cosmwasm-std/backtraces"]
+# use library feature to disable all instantiate/execute/query exports
+library = []
+
+[dependencies]
+cosmwasm-std = "1.1"
+cosmwasm-schema = "1.1"
+cw-storage-plus = "0.16"
+cw2 = "0.16"
+cw721 = "0.16"
+cw721-proxy = { path = "../../packages/cw721-proxy", version = "*" }
+cw721-proxy-derive = { path = "../../packages/cw721-proxy-derive", version = "*" }
+cw721-whitelist = { path = "../../packages/cw721-whitelist", version = "*" }
+thiserror = "1"
+
+[dev-dependencies]
+cw-multi-test = "0.16.0"
+cw721-base = "0.16"
+cw721-proxy-tester = { path = "../../debug/cw721-proxy-tester", version = "*" }
+rand = "0.8"
+anyhow = "1.0"
