@@ -102,7 +102,7 @@ pub fn execute_receive_nft(
     info: MessageInfo,
     msg: cw721::Cw721ReceiveMsg,
 ) -> Result<Response, ContractError> {
-    query_is_whitelisted(deps.storage, &info.sender.to_string())?;
+    is_whitelisted(deps.storage, &info.sender.to_string())?;
     Ok(Response::default().add_message(WasmMsg::Execute {
         contract_addr: ORIGIN.load(deps.storage)?.into_string(),
         msg: to_binary(&ProxyExecuteMsg::ReceiveProxyNft {
@@ -122,7 +122,7 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     }
 }
 
-pub fn query_is_whitelisted(storage: &dyn Storage, addr: &String) -> Result<(), ContractError> {
+pub fn is_whitelisted(storage: &dyn Storage, addr: &String) -> Result<(), ContractError> {
     match WHITELIST.query_is_whitelisted(storage, addr)? {
         true => Ok(()),
         false => Err(ContractError::Unauthorized { addr: addr.to_string() }),
