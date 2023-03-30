@@ -5,4 +5,4 @@ use crate::WhiteList;
 
 pub const OWNER: Item<Addr> = Item::new("owner");
 pub const ORIGIN: Item<Addr> = Item::new("origin");
-pub const WHITELIST: WhiteList = WhiteList::new();
+pub const WHITELIST: WhiteList<String> = WhiteList::new();
