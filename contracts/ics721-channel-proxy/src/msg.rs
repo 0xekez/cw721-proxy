@@ -10,8 +10,8 @@ pub struct InstantiateMsg {
 #[cw_serde]
 pub enum ExecuteMsg {
     ReceiveNft(cw721::Cw721ReceiveMsg),
-    AddToWhitelist(String),
-    RemoveFromWhitelist(String),
+    AddToWhitelist { channel: String },
+    RemoveFromWhitelist { channel: String },
 }
 
 #[cw_serde]
@@ -24,7 +24,7 @@ pub enum QueryMsg {
     Whitelist {},
 
     #[returns(bool)]
-    WhiteListed(String),
+    WhiteListed { channel: String },
 }
 
 /// Copied from: https://github.com/public-awesome/ics721/blob/main/contracts/cw-ics721-bridge/src/msg.rs#L84-L95

@@ -62,9 +62,11 @@ pub fn execute(
 ) -> Result<Response, ContractError> {
     match msg {
         ExecuteMsg::ReceiveNft(msg) => execute_receive_nft(deps, env, info, msg),
-        ExecuteMsg::AddToWhitelist(addr) => execute_add_to_whitelist(deps, env, info, &addr),
-        ExecuteMsg::RemoveFromWhitelist(addr) => {
-            execute_remove_from_whitelist(deps, env, info, &addr)
+        ExecuteMsg::AddToWhitelist { channel } => {
+            execute_add_to_whitelist(deps, env, info, &channel)
+        }
+        ExecuteMsg::RemoveFromWhitelist { channel } => {
+            execute_remove_from_whitelist(deps, env, info, &channel)
         }
     }
 }
@@ -125,8 +127,8 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
         QueryMsg::Origin {} => to_binary(&ORIGIN.load(deps.storage)?),
         QueryMsg::Whitelist {} => to_binary(&WHITELIST.query_whitelist(deps.storage)?),
-        QueryMsg::WhiteListed(addr) => {
-            to_binary(&WHITELIST.query_is_whitelisted(deps.storage, &addr)?)
+        QueryMsg::WhiteListed { channel } => {
+            to_binary(&WHITELIST.query_is_whitelisted(deps.storage, &channel)?)
         }
     }
 }

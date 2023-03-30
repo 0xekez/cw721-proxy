@@ -82,27 +82,27 @@ impl Test {
 
     pub fn add_to_whitelist(
         &mut self,
-        sender: Addr,
-        wl_addr: String,
+        owner: Addr,
+        channel: String,
     ) -> Result<AppResponse, anyhow::Error> {
         let res = self.app.execute_contract(
-            sender.clone(),
+            owner.clone(),
             self.cw721_proxy.clone(),
-            &ExecuteMsg::AddToWhitelist(wl_addr),
+            &ExecuteMsg::AddToWhitelist { channel },
             &[],
         )?;
         Ok(res)
     }
 
-    pub fn remove_whitelist(
+    pub fn remove_from_whitelist(
         &mut self,
-        sender: Addr,
-        wl_addr: String,
+        owner: Addr,
+        channel: String,
     ) -> Result<AppResponse, anyhow::Error> {
         let res = self.app.execute_contract(
-            sender.clone(),
+            owner.clone(),
             self.cw721_proxy.clone(),
-            &ExecuteMsg::RemoveFromWhitelist(wl_addr),
+            &ExecuteMsg::RemoveFromWhitelist { channel },
             &[],
         )?;
         Ok(res)
@@ -254,7 +254,7 @@ fn add_to_whitelist_unauthorized() {
 #[test]
 fn remove_whitelist_authorized() {
     let mut test = Test::new(1);
-    test.remove_whitelist(test.minter.clone(), "any".to_string())
+    test.remove_from_whitelist(test.minter.clone(), "any".to_string())
         .unwrap();
 }
 
@@ -262,7 +262,7 @@ fn remove_whitelist_authorized() {
 fn remove_from_whitelist_unauthorized() {
     let mut test = Test::new(1);
     let err: ContractError = test
-        .remove_whitelist(Addr::unchecked("unauthorized"), "any".to_string())
+        .remove_from_whitelist(Addr::unchecked("unauthorized"), "any".to_string())
         .unwrap_err()
         .downcast()
         .unwrap();
@@ -275,7 +275,7 @@ fn remove_from_whitelist_unauthorized() {
 }
 
 #[test]
-fn send_whitelisted() {
+fn send_authorized() {
     let mut test = Test::new(1);
     let channel_id = "governedchannel-123";
     test.add_to_whitelist(test.minter.clone(), channel_id.to_string())
@@ -304,7 +304,7 @@ fn send_whitelisted() {
 }
 
 #[test]
-fn send_not_whitelisted() {
+fn send_unauthorized() {
     let mut test = Test::new(1);
     let token_id = test.mint(test.cw721s[0].clone()).unwrap();
     let channel_id = "ungovernedchannel-123";

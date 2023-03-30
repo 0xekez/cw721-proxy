@@ -10,8 +10,8 @@ pub struct InstantiateMsg {
 #[cw_serde]
 pub enum ExecuteMsg {
     ReceiveNft(cw721::Cw721ReceiveMsg),
-    AddToWhitelist(String),
-    RemoveFromWhitelist(String),
+    AddToWhitelist { sender: String },
+    RemoveFromWhitelist { sender: String },
 }
 
 #[cw_serde]
@@ -24,5 +24,5 @@ pub enum QueryMsg {
     Whitelist {},
 
     #[returns(bool)]
-    WhiteListed(String),
+    WhiteListed { sender: String },
 }
