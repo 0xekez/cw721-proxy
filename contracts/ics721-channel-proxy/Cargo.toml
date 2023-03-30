@@ -1,5 +1,5 @@
 [package]
-name = "ics721-channel-whitelist-proxy"
+name = "ics721-channel-proxy"
 authors = ["Mr T <mr-t@arkprotocol>"]
 edition = "2021"
 version = "0.0.1"

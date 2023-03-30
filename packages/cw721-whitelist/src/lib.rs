@@ -17,11 +17,7 @@ where
         }
     }
 
-    pub fn init(&self, deps: DepsMut, whitelist: Option<Vec<T>>) -> StdResult<()> {
-        let whitelist = whitelist
-            .map_or(vec![], |wl| wl)
-            .into_iter()
-            .collect();
+    pub fn init(&self, deps: DepsMut, whitelist: Vec<T>) -> StdResult<()> {
         self.whitelist.save(deps.storage, &whitelist)
     }
 

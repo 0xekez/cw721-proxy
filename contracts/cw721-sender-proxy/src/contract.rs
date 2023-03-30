@@ -38,7 +38,9 @@ pub fn instantiate(
         deps.storage,
         &origin,
     )?;
-    WHITELIST.init(deps, msg.whitelist)?;
+    if msg.whitelist.is_some() {
+        WHITELIST.init(deps, msg.whitelist.unwrap())?;
+    }
     Ok(Response::default()
         .add_attribute("method", "instantiate")
         .add_attribute("origin", origin)

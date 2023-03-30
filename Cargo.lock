@@ -433,7 +433,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "cw721-sender-whitelist-proxy"
+name = "cw721-sender-proxy"
 version = "0.0.1"
 dependencies = [
  "anyhow",
@@ -637,7 +637,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "ics721-channel-whitelist-proxy"
+name = "ics721-channel-proxy"
 version = "0.0.1"
 dependencies = [
  "anyhow",
