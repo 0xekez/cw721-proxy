@@ -34,7 +34,7 @@
         "additionalProperties": false
       },
       {
-        "description": "Add CW721 and channels to whitelist.",
+        "description": "Add CW721 contract and channels to whitelist.",
         "type": "object",
         "required": [
           "add_to_whitelist"
@@ -63,7 +63,7 @@
         "additionalProperties": false
       },
       {
-        "description": "Remove CW721 and all channels from whitelist.",
+        "description": "Add CW721 conract and channels to whitelist.",
         "type": "object",
         "required": [
           "remove_from_whitelist"

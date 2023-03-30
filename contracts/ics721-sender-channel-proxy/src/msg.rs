@@ -10,12 +10,12 @@ pub struct InstantiateMsg {
 pub enum ExecuteMsg {
     /// Incoming msg from CW721 contract for ICS721 transfer.
     ReceiveNft(cw721::Cw721ReceiveMsg),
-    /// Add CW721 and channels to whitelist.
+    /// Add CW721 contract and channels to whitelist.
     AddToWhitelist {
         sender: String,
         channels: Vec<String>,
     },
-    /// Remove CW721 and all channels from whitelist.
+    /// Add CW721 conract and channels to whitelist.
     RemoveFromWhitelist { sender: String },
 }
 

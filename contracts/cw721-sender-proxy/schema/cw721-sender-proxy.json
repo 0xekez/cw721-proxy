@@ -42,6 +42,7 @@
         "additionalProperties": false
       },
       {
+        "description": "Add CW721 contract to whitelist.",
         "type": "object",
         "required": [
           "add_to_whitelist"
@@ -63,6 +64,7 @@
         "additionalProperties": false
       },
       {
+        "description": "Add CW721 contract to whitelist.",
         "type": "object",
         "required": [
           "remove_from_whitelist"
@@ -117,6 +119,7 @@
     "title": "QueryMsg",
     "oneOf": [
       {
+        "description": "Gets ICS721 contract.",
         "type": "object",
         "required": [
           "origin"
@@ -130,6 +133,7 @@
         "additionalProperties": false
       },
       {
+        "description": "Gets a list of CW721 contracts authorized for ICS721 transfers.",
         "type": "object",
         "required": [
           "whitelist"
@@ -143,6 +147,7 @@
         "additionalProperties": false
       },
       {
+        "description": "True in case CW721 contract is authorized for ICS721 transfers.",
         "type": "object",
         "required": [
           "white_listed"

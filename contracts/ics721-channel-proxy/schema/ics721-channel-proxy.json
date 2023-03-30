@@ -30,6 +30,7 @@
     "title": "ExecuteMsg",
     "oneOf": [
       {
+        "description": "Incoming msg from CW721 contract for ICS721 transfer.",
         "type": "object",
         "required": [
           "receive_nft"
@@ -42,6 +43,7 @@
         "additionalProperties": false
       },
       {
+        "description": "Add channel to whitelist.",
         "type": "object",
         "required": [
           "add_to_whitelist"
@@ -63,6 +65,7 @@
         "additionalProperties": false
       },
       {
+        "description": "Remove channel from whitelist.",
         "type": "object",
         "required": [
           "remove_from_whitelist"
@@ -117,6 +120,7 @@
     "title": "QueryMsg",
     "oneOf": [
       {
+        "description": "Gets ICS721 contract.",
         "type": "object",
         "required": [
           "origin"
@@ -130,6 +134,7 @@
         "additionalProperties": false
       },
       {
+        "description": "Gets a list of channels authorized for ICS721 transfers.",
         "type": "object",
         "required": [
           "whitelist"
@@ -143,6 +148,7 @@
         "additionalProperties": false
       },
       {
+        "description": "True in case channel is authorized for ICS721 transfers.",
         "type": "object",
         "required": [
           "white_listed"
@@ -181,16 +187,10 @@
     },
     "whitelist": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Array_of_Addr",
+      "title": "Array_of_String",
       "type": "array",
       "items": {
-        "$ref": "#/definitions/Addr"
-      },
-      "definitions": {
-        "Addr": {
-          "description": "A human readable address.\n\nIn Cosmos, this is typically bech32 encoded. But for multi-chain smart contracts no assumptions should be made other than being UTF-8 encoded and of reasonable length.\n\nThis type represents a validated address. It can be created in the following ways 1. Use `Addr::unchecked(input)` 2. Use `let checked: Addr = deps.api.addr_validate(input)?` 3. Use `let checked: Addr = deps.api.addr_humanize(canonical_addr)?` 4. Deserialize from JSON. This must only be done from JSON that was validated before such as a contract's state. `Addr` must not be used in messages sent by the user because this would result in unvalidated instances.\n\nThis type is immutable. If you really need to mutate it (Really? Are you sure?), create a mutable copy using `let mut mutable = Addr::to_string()` and operate on that `String` instance.",
-          "type": "string"
-        }
+        "type": "string"
       }
     }
   }

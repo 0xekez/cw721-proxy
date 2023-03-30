@@ -10,19 +10,24 @@ pub struct InstantiateMsg {
 #[cw_serde]
 pub enum ExecuteMsg {
     ReceiveNft(cw721::Cw721ReceiveMsg),
+    /// Add CW721 contract to whitelist.
     AddToWhitelist { sender: String },
+    /// Add CW721 contract to whitelist.
     RemoveFromWhitelist { sender: String },
 }
 
 #[cw_serde]
 #[derive(QueryResponses)]
 pub enum QueryMsg {
+    /// Gets ICS721 contract.
     #[returns(Addr)]
     Origin {},
 
+    /// Gets a list of CW721 contracts authorized for ICS721 transfers.
     #[returns(Vec<Addr>)]
     Whitelist {},
 
+    /// True in case CW721 contract is authorized for ICS721 transfers.
     #[returns(bool)]
     WhiteListed { sender: String },
 }

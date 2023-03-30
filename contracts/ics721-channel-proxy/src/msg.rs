@@ -9,20 +9,26 @@ pub struct InstantiateMsg {
 
 #[cw_serde]
 pub enum ExecuteMsg {
+    /// Incoming msg from CW721 contract for ICS721 transfer.
     ReceiveNft(cw721::Cw721ReceiveMsg),
+    /// Add channel to whitelist.
     AddToWhitelist { channel: String },
+    /// Remove channel from whitelist.
     RemoveFromWhitelist { channel: String },
 }
 
 #[cw_serde]
 #[derive(QueryResponses)]
 pub enum QueryMsg {
+    /// Gets ICS721 contract.
     #[returns(Addr)]
     Origin {},
 
-    #[returns(Vec<Addr>)]
+    /// Gets a list of channels authorized for ICS721 transfers.
+    #[returns(Vec<String>)]
     Whitelist {},
 
+    /// True in case channel is authorized for ICS721 transfers.
     #[returns(bool)]
     WhiteListed { channel: String },
 }
