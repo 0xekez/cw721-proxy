@@ -1,5 +1,5 @@
 use cosmwasm_std::{StdResult, Storage, DepsMut};
-use cw_storage_plus::{Item};
+use cw_storage_plus::Item;
 use serde::{Serialize, de::DeserializeOwned};
 
 
@@ -17,7 +17,11 @@ where
         }
     }
 
-    pub fn init(&self, deps: DepsMut, whitelist: Vec<T>) -> StdResult<()> {
+    pub fn init(&self, deps: DepsMut, whitelist: Option<Vec<T>>) -> StdResult<()> {
+        let whitelist = whitelist
+            .map_or(vec![], |wl| wl)
+            .into_iter()
+            .collect();
         self.whitelist.save(deps.storage, &whitelist)
     }
 
