@@ -21,9 +21,8 @@ pub enum QueryMsg {
     Origin {},
 
     #[returns(Vec<Addr>)]
-    Whitelist{},
+    Whitelist {},
 
     #[returns(bool)]
     WhiteListed(String),
-
 }

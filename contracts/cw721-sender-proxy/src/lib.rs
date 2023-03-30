@@ -1,9 +1,9 @@
 pub mod contract;
-pub mod state;
-pub mod msg;
 pub mod error;
+pub mod msg;
+pub mod state;
 
 #[cfg(test)]
 mod tests;
 
-pub use cw721_whitelist::{WhiteList};
+pub use cw721_whitelist::WhiteList;

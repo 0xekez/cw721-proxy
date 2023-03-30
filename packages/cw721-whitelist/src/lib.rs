@@ -1,7 +1,6 @@
-use cosmwasm_std::{StdResult, Storage, DepsMut};
+use cosmwasm_std::{DepsMut, StdResult, Storage};
 use cw_storage_plus::Item;
-use serde::{Serialize, de::DeserializeOwned};
-
+use serde::{de::DeserializeOwned, Serialize};
 
 pub struct WhiteList<'a, T> {
     whitelist: Item<'a, Vec<T>>,
@@ -18,10 +17,7 @@ where
     }
 
     pub fn init(&self, deps: DepsMut, whitelist: Option<Vec<T>>) -> StdResult<()> {
-        let whitelist = whitelist
-            .map_or(vec![], |wl| wl)
-            .into_iter()
-            .collect();
+        let whitelist = whitelist.map_or(vec![], |wl| wl).into_iter().collect();
         self.whitelist.save(deps.storage, &whitelist)
     }
 

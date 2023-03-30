@@ -1,9 +1,10 @@
-use cosmwasm_std::{Addr, Empty, StdResult, to_binary};
-use cw_multi_test::{App, Contract, ContractWrapper, Executor, AppResponse};
+use cosmwasm_std::{to_binary, Addr, Empty, StdResult};
+use cw_multi_test::{App, AppResponse, Contract, ContractWrapper, Executor};
 
-use crate::{msg::{InstantiateMsg, QueryMsg, ExecuteMsg}, error::ContractError};
-
-
+use crate::{
+    error::ContractError,
+    msg::{ExecuteMsg, InstantiateMsg, QueryMsg},
+};
 
 struct Test {
     pub app: App,
@@ -40,7 +41,7 @@ impl Test {
             .instantiate_contract(
                 cw721_proxy_code_id,
                 minter.clone(),
-                &InstantiateMsg{
+                &InstantiateMsg {
                     origin: Some(mock_receiver.to_string()),
                     whitelist: None,
                 },
@@ -77,10 +78,13 @@ impl Test {
             mock_receiver,
             nfts_minted: 0,
         }
-
     }
 
-    pub fn add_to_whitelist(&mut self, sender: Addr, wl_addr: String) -> Result<AppResponse, anyhow::Error> {
+    pub fn add_to_whitelist(
+        &mut self,
+        sender: Addr,
+        wl_addr: String,
+    ) -> Result<AppResponse, anyhow::Error> {
         let res = self.app.execute_contract(
             sender.clone(),
             self.cw721_proxy.clone(),
@@ -90,7 +94,11 @@ impl Test {
         Ok(res)
     }
 
-    pub fn remove_whitelist(&mut self, sender: Addr, wl_addr: String) -> Result<AppResponse, anyhow::Error> {
+    pub fn remove_whitelist(
+        &mut self,
+        sender: Addr,
+        wl_addr: String,
+    ) -> Result<AppResponse, anyhow::Error> {
         let res = self.app.execute_contract(
             sender.clone(),
             self.cw721_proxy.clone(),
@@ -118,7 +126,11 @@ impl Test {
         Ok(self.nfts_minted.to_string())
     }
 
-    pub fn send_nft(&mut self, collection: Addr, token_id: String) -> Result<AppResponse, anyhow::Error> {
+    pub fn send_nft(
+        &mut self,
+        collection: Addr,
+        token_id: String,
+    ) -> Result<AppResponse, anyhow::Error> {
         let res = self.app.execute_contract(
             self.minter.clone(),
             collection.clone(),
@@ -206,7 +218,8 @@ fn test_origin_specified() {
 #[test]
 fn add_to_whitelist_authorized() {
     let mut test = Test::new(1);
-    test.add_to_whitelist(test.minter.clone(), "any".to_string()).unwrap();
+    test.add_to_whitelist(test.minter.clone(), "any".to_string())
+        .unwrap();
 }
 
 #[test]
@@ -219,14 +232,17 @@ fn add_to_whitelist_unauthorized() {
         .unwrap();
     assert_eq!(
         err,
-        ContractError::Unauthorized { addr: "unauthorized".to_string() }
+        ContractError::Unauthorized {
+            addr: "unauthorized".to_string()
+        }
     )
 }
 
 #[test]
 fn remove_whitelist_authorized() {
     let mut test = Test::new(1);
-    test.remove_whitelist(test.minter.clone(), "any".to_string()).unwrap();
+    test.remove_whitelist(test.minter.clone(), "any".to_string())
+        .unwrap();
 }
 
 #[test]
@@ -239,17 +255,21 @@ fn remove_from_whitelist_unauthorized() {
         .unwrap();
     assert_eq!(
         err,
-        ContractError::Unauthorized { addr: "unauthorized".to_string() }
+        ContractError::Unauthorized {
+            addr: "unauthorized".to_string()
+        }
     )
 }
 
 #[test]
 fn send_whitelisted() {
     let mut test = Test::new(1);
-    test.add_to_whitelist(test.minter.clone(), test.cw721s[0].to_string()).unwrap();
+    test.add_to_whitelist(test.minter.clone(), test.cw721s[0].to_string())
+        .unwrap();
 
     let token_id = test.mint(test.cw721s[0].clone()).unwrap();
-    test.send_nft(test.cw721s[0].clone(), token_id.clone()).unwrap();
+    test.send_nft(test.cw721s[0].clone(), token_id.clone())
+        .unwrap();
     match test.query_last_msg().unwrap() {
         cw721_proxy_tester::msg::ExecuteMsg::ReceiveProxyNft { eyeball, msg } => {
             assert_eq!(eyeball, test.cw721s[0].clone());
@@ -263,7 +283,6 @@ fn send_whitelisted() {
             )
         }
     }
-
 }
 
 #[test]
@@ -277,6 +296,8 @@ fn send_not_whitelisted() {
         .unwrap();
     assert_eq!(
         err,
-        ContractError::Unauthorized { addr: test.cw721s[0].clone().to_string() }
+        ContractError::Unauthorized {
+            addr: test.cw721s[0].clone().to_string()
+        }
     )
 }

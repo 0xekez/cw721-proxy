@@ -21,11 +21,10 @@ pub enum QueryMsg {
     Origin {},
 
     #[returns(Vec<Addr>)]
-    Whitelist{},
+    Whitelist {},
 
     #[returns(bool)]
     WhiteListed(String),
-
 }
 
 /// Copied from: https://github.com/public-awesome/ics721/blob/main/contracts/cw-ics721-bridge/src/msg.rs#L84-L95
