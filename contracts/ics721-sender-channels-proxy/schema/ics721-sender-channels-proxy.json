@@ -1,5 +1,5 @@
 {
-  "contract_name": "ics721-sender-channel-proxy",
+  "contract_name": "ics721-sender-channels-proxy",
   "contract_version": "0.0.1",
   "idl_version": "1.0.0",
   "instantiate": {
