@@ -1,3 +1,4 @@
+#[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 use cosmwasm_std::from_binary;
 use cosmwasm_std::to_binary;
@@ -9,7 +10,6 @@ use cosmwasm_std::Response;
 use cosmwasm_std::StdResult;
 use cosmwasm_std::Storage;
 use cosmwasm_std::WasmMsg;
-#[cfg(not(feature = "library"))]
 use cosmwasm_std::{DepsMut, Env, MessageInfo};
 use cw2::set_contract_version;
 use cw721_proxy::ProxyExecuteMsg;
