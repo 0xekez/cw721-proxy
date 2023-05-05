@@ -35,3 +35,8 @@ pub enum QueryMsg {
     #[returns(bool)]
     WhiteListed { sender: String },
 }
+
+#[cw_serde]
+pub enum MigrateMsg {
+    WithUpdate { whitelist: Option<Vec<String>> },
+}

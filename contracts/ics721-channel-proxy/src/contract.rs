@@ -15,6 +15,7 @@ use cw721_proxy::ProxyExecuteMsg;
 
 use crate::msg::ExecuteMsg;
 use crate::msg::IbcOutgoingMsg;
+use crate::msg::MigrateMsg;
 use crate::msg::QueryMsg;
 use crate::state::ORIGIN;
 use crate::state::OWNER;
@@ -153,5 +154,22 @@ pub fn is_whitelisted(storage: &dyn Storage, channel: &String) -> Result<(), Con
         false => Err(ContractError::UnauthorizedChannel {
             channel: channel.to_string(),
         }),
+    }
+}
+
+#[cfg_attr(not(feature = "library"), entry_point)]
+pub fn migrate(deps: DepsMut, _env: Env, msg: MigrateMsg) -> Result<Response, ContractError> {
+    // Set contract to version to latest
+    set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
+
+    match msg {
+        MigrateMsg::WithUpdate { whitelist } => {
+            if let Some(list) = whitelist {
+                list.iter()
+                    .map(|item| WHITELIST.add(deps.storage, &item.to_string()))
+                    .collect::<StdResult<Vec<_>>>()?;
+            }
+            Ok(Response::default().add_attribute("method", "migrate"))
+        }
     }
 }

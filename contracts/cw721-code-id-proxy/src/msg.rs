@@ -26,3 +26,8 @@ pub enum QueryMsg {
     #[returns(bool)]
     WhiteListed { code_id: u64 },
 }
+
+#[cw_serde]
+pub enum MigrateMsg {
+    WithUpdate { whitelist: Option<Vec<u64>> },
+}

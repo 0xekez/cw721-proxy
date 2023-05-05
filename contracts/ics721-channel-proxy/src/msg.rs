@@ -47,3 +47,8 @@ pub struct IbcOutgoingMsg {
     /// Memo to add custom string to the msg
     pub memo: Option<String>,
 }
+
+#[cw_serde]
+pub enum MigrateMsg {
+    WithUpdate { whitelist: Option<Vec<String>> },
+}

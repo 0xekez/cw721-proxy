@@ -58,3 +58,10 @@ pub struct SenderToChannelsResponse {
     /// Authorized channels for ICS721 transfers.
     pub channels: Vec<String>,
 }
+
+#[cw_serde]
+pub enum MigrateMsg {
+    WithUpdate {
+        whitelist: Option<Vec<SenderToChannelsResponse>>,
+    },
+}
