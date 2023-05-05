@@ -63,5 +63,6 @@ pub struct SenderToChannelsResponse {
 pub enum MigrateMsg {
     WithUpdate {
         whitelist: Option<Vec<SenderToChannelsResponse>>,
+        origin: Option<String>,
     },
 }

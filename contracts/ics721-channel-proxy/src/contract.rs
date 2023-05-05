@@ -163,11 +163,15 @@ pub fn migrate(deps: DepsMut, _env: Env, msg: MigrateMsg) -> Result<Response, Co
     set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
 
     match msg {
-        MigrateMsg::WithUpdate { whitelist } => {
+        MigrateMsg::WithUpdate { origin, whitelist } => {
             if let Some(list) = whitelist {
                 list.iter()
                     .map(|item| WHITELIST.add(deps.storage, &item.to_string()))
                     .collect::<StdResult<Vec<_>>>()?;
+            }
+            if let Some(origin) = origin {
+                let origin = deps.api.addr_validate(&origin)?;
+                ORIGIN.save(deps.storage, &origin)?;
             }
             Ok(Response::default().add_attribute("method", "migrate"))
         }

@@ -29,5 +29,8 @@ pub enum QueryMsg {
 
 #[cw_serde]
 pub enum MigrateMsg {
-    WithUpdate { whitelist: Option<Vec<u64>> },
+    WithUpdate {
+        whitelist: Option<Vec<u64>>,
+        origin: Option<String>,
+    },
 }
