@@ -9,7 +9,7 @@ use cw721_proxy::ProxyExecuteMsg;
 use cw_rate_limiter::Rate;
 
 use crate::error::ContractError;
-use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
+use crate::msg::{ExecuteMsg, InstantiateMsg, MigrateMsg, QueryMsg};
 use crate::state::{ORIGIN, RATE_LIMIT};
 
 const CONTRACT_NAME: &str = "crates.io:cw721-proxy-rate-limit";
@@ -79,5 +79,28 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
         QueryMsg::RateLimit {} => to_binary(&RATE_LIMIT.query_limit(deps.storage)?),
         QueryMsg::Origin {} => to_binary(&ORIGIN.load(deps.storage)?),
+    }
+}
+
+#[cfg_attr(not(feature = "library"), entry_point)]
+pub fn migrate(deps: DepsMut, _env: Env, msg: MigrateMsg) -> Result<Response, ContractError> {
+    // Set contract to latest version
+    set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
+
+    match msg {
+        MigrateMsg::WithUpdate { origin, rate_limit } => {
+            if let Some(rate) = rate_limit {
+                if rate.is_zero() {
+                    return Err(ContractError::ZeroRate {});
+                } else {
+                    RATE_LIMIT.init(deps.storage, &rate)?;
+                }
+            }
+            if let Some(origin) = origin {
+                let origin = deps.api.addr_validate(&origin)?;
+                ORIGIN.save(deps.storage, &origin)?;
+            }
+            Ok(Response::default().add_attribute("method", "migrate"))
+        }
     }
 }

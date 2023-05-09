@@ -23,3 +23,11 @@ pub enum QueryMsg {
     #[returns(String)]
     Origin {},
 }
+
+#[cw_serde]
+pub enum MigrateMsg {
+    WithUpdate {
+        rate_limit: Option<Rate>,
+        origin: Option<String>,
+    },
+}
