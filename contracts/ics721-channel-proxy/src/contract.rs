@@ -84,13 +84,14 @@ pub fn execute_owner(
     deps: DepsMut,
     _env: Env,
     info: MessageInfo,
-    owner: Addr,
+    addr: String,
 ) -> Result<Response, ContractError> {
+    let addr = deps.api.addr_validate(&addr)?;
     is_owner(deps.storage, info.sender)?;
-    ORIGIN.save(deps.storage, &owner)?;
+    ORIGIN.save(deps.storage, &addr)?;
     Ok(Response::default()
         .add_attribute("method", "execute_owner")
-        .add_attribute("owner", owner))
+        .add_attribute("owner", addr))
 }
 
 pub fn execute_add_to_whitelist(
@@ -162,13 +163,14 @@ pub fn execute_origin(
     deps: DepsMut,
     _env: Env,
     info: MessageInfo,
-    origin: Addr,
+    addr: String,
 ) -> Result<Response, ContractError> {
+    let addr = deps.api.addr_validate(&addr)?;
     is_owner(deps.storage, info.sender)?;
-    ORIGIN.save(deps.storage, &origin)?;
+    ORIGIN.save(deps.storage, &addr)?;
     Ok(Response::default()
         .add_attribute("method", "execute_origin")
-        .add_attribute("origin", origin))
+        .add_attribute("origin", addr))
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]

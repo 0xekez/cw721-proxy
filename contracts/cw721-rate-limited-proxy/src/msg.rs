@@ -11,10 +11,10 @@ pub struct InstantiateMsg {
 
 #[cw_serde]
 pub enum ExecuteMsg {
-    Owner(Addr),
+    Owner(String),
     ReceiveNft(cw721::Cw721ReceiveMsg),
     RateLimit(Rate),
-    Origin(Addr),
+    Origin(String),
 }
 
 #[cw_serde]

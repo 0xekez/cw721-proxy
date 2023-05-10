@@ -9,7 +9,7 @@ pub struct InstantiateMsg {
 
 #[cw_serde]
 pub enum ExecuteMsg {
-    Owner(Addr),
+    Owner(String),
     /// Incoming msg from CW721 contract for ICS721 transfer.
     ReceiveNft(cw721::Cw721ReceiveMsg),
     /// Add channel to whitelist.
@@ -20,7 +20,7 @@ pub enum ExecuteMsg {
     RemoveFromWhitelist {
         channel: String,
     },
-    Origin(Addr),
+    Origin(String),
 }
 
 #[cw_serde]
