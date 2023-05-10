@@ -19,6 +19,9 @@ pub enum ExecuteMsg {
 #[derive(QueryResponses)]
 pub enum QueryMsg {
     #[returns(Addr)]
+    Owner {},
+
+    #[returns(Addr)]
     Origin {},
 
     #[returns(Vec<Addr>)]

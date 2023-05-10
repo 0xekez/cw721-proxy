@@ -25,6 +25,9 @@ pub enum ExecuteMsg {
 #[cw_serde]
 #[derive(QueryResponses)]
 pub enum QueryMsg {
+    #[returns(Addr)]
+    Owner {},
+
     /// Gets ICS721 contract.
     #[returns(Addr)]
     Origin {},

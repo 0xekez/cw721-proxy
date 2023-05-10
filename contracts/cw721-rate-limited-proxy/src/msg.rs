@@ -19,6 +19,9 @@ pub enum ExecuteMsg {
 #[cw_serde]
 #[derive(QueryResponses)]
 pub enum QueryMsg {
+    #[returns(Addr)]
+    Owner {},
+
     /// Gets the contract's rate limit.
     #[returns(Rate)]
     RateLimit {},

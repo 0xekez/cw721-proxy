@@ -48,8 +48,8 @@ pub fn instantiate(
     }
 }
 
-pub fn is_owner(storage: &dyn Storage, addr: &Addr) -> Result<(), ContractError> {
-    if addr != &OWNER.load(storage).unwrap() {
+pub fn is_owner(storage: &dyn Storage, addr: Addr) -> Result<(), ContractError> {
+    if addr != OWNER.load(storage).unwrap() {
         return Err(ContractError::Unauthorized {
             addr: addr.to_string(),
         });
@@ -66,8 +66,8 @@ pub fn execute(
 ) -> Result<Response, ContractError> {
     match msg {
         ExecuteMsg::ReceiveNft(msg) => execute_receive_nft(deps, env, info, msg),
-        ExecuteMsg::RateLimit(rate_limit) => execute_rate_limit(deps, env, &info, rate_limit),
-        ExecuteMsg::Origin(origin) => execute_origin(deps, env, &info, origin),
+        ExecuteMsg::RateLimit(rate_limit) => execute_rate_limit(deps, env, info, rate_limit),
+        ExecuteMsg::Origin(origin) => execute_origin(deps, env, info, origin),
     }
 }
 
@@ -107,10 +107,10 @@ pub fn execute_receive_nft(
 pub fn execute_rate_limit(
     deps: DepsMut,
     _env: Env,
-    info: &MessageInfo,
+    info: MessageInfo,
     rate_limit: Rate,
 ) -> Result<Response, ContractError> {
-    is_owner(deps.storage, &info.sender)?;
+    is_owner(deps.storage, info.sender)?;
     if rate_limit.is_zero() {
         Err(ContractError::ZeroRate {})
     } else {
@@ -129,10 +129,10 @@ pub fn execute_rate_limit(
 pub fn execute_origin(
     deps: DepsMut,
     _env: Env,
-    info: &MessageInfo,
+    info: MessageInfo,
     origin: Addr,
 ) -> Result<Response, ContractError> {
-    is_owner(deps.storage, &info.sender)?;
+    is_owner(deps.storage, info.sender)?;
     ORIGIN.save(deps.storage, &origin)?;
     Ok(Response::default()
         .add_attribute("method", "execute_origin")
@@ -142,8 +142,9 @@ pub fn execute_origin(
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
+        QueryMsg::Owner {} => to_binary(&OWNER.may_load(deps.storage)?),
+        QueryMsg::Origin {} => to_binary(&ORIGIN.may_load(deps.storage)?),
         QueryMsg::RateLimit {} => to_binary(&RATE_LIMIT.query_limit(deps.storage)?),
-        QueryMsg::Origin {} => to_binary(&ORIGIN.load(deps.storage)?),
     }
 }
 

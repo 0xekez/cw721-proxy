@@ -50,8 +50,8 @@ pub fn instantiate(
         ))
 }
 
-pub fn is_owner(storage: &dyn Storage, addr: &Addr) -> Result<(), ContractError> {
-    if addr != &OWNER.load(storage).unwrap() {
+pub fn is_owner(storage: &dyn Storage, addr: Addr) -> Result<(), ContractError> {
+    if addr != OWNER.load(storage).unwrap() {
         return Err(ContractError::Unauthorized {
             addr: addr.to_string(),
         });
@@ -72,7 +72,7 @@ pub fn execute(
         ExecuteMsg::RemoveFromWhitelist { sender } => {
             execute_remove_from_whitelist(deps, env, info, &sender)
         }
-        ExecuteMsg::Origin(origin) => execute_origin(deps, env, &info, origin),
+        ExecuteMsg::Origin(origin) => execute_origin(deps, env, info, origin),
     }
 }
 
@@ -82,7 +82,7 @@ pub fn execute_add_to_whitelist(
     info: MessageInfo,
     sender: &str,
 ) -> Result<Response, ContractError> {
-    is_owner(deps.storage, &info.sender)?;
+    is_owner(deps.storage, info.sender)?;
     let sender = deps.api.addr_validate(sender)?;
     WHITELIST.add(deps.storage, &sender.to_string())?;
     Ok(Response::default()
@@ -96,7 +96,7 @@ pub fn execute_remove_from_whitelist(
     info: MessageInfo,
     sender: &str,
 ) -> Result<Response, ContractError> {
-    is_owner(deps.storage, &info.sender)?;
+    is_owner(deps.storage, info.sender)?;
     let sender = deps.api.addr_validate(sender)?;
     WHITELIST.remove(deps.storage, &sender.to_string())?;
     Ok(Response::default()
@@ -140,10 +140,10 @@ pub fn execute_receive_nft(
 pub fn execute_origin(
     deps: DepsMut,
     _env: Env,
-    info: &MessageInfo,
+    info: MessageInfo,
     origin: Addr,
 ) -> Result<Response, ContractError> {
-    is_owner(deps.storage, &info.sender)?;
+    is_owner(deps.storage, info.sender)?;
     ORIGIN.save(deps.storage, &origin)?;
     Ok(Response::default()
         .add_attribute("method", "execute_origin")
@@ -153,7 +153,8 @@ pub fn execute_origin(
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
-        QueryMsg::Origin {} => to_binary(&ORIGIN.load(deps.storage)?),
+        QueryMsg::Owner {} => to_binary(&OWNER.may_load(deps.storage)?),
+        QueryMsg::Origin {} => to_binary(&ORIGIN.may_load(deps.storage)?),
         QueryMsg::Whitelist {} => to_binary(&WHITELIST.query_whitelist(deps.storage)?),
         QueryMsg::WhiteListed { sender } => {
             to_binary(&WHITELIST.query_is_whitelisted(deps.storage, &sender)?)
