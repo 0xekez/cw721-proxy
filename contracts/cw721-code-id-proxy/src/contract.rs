@@ -75,7 +75,21 @@ pub fn execute(
             execute_remove_from_whitelist(deps, env, info, &code_id)
         }
         ExecuteMsg::Origin(origin) => execute_origin(deps, env, info, origin),
+        ExecuteMsg::Owner(owner) => execute_owner(deps, env, info, owner),
     }
+}
+
+pub fn execute_owner(
+    deps: DepsMut,
+    _env: Env,
+    info: MessageInfo,
+    owner: Addr,
+) -> Result<Response, ContractError> {
+    is_owner(deps.storage, info.sender)?;
+    ORIGIN.save(deps.storage, &owner)?;
+    Ok(Response::default()
+        .add_attribute("method", "execute_owner")
+        .add_attribute("owner", owner))
 }
 
 pub fn execute_add_to_whitelist(

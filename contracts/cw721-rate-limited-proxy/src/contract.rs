@@ -68,7 +68,21 @@ pub fn execute(
         ExecuteMsg::ReceiveNft(msg) => execute_receive_nft(deps, env, info, msg),
         ExecuteMsg::RateLimit(rate_limit) => execute_rate_limit(deps, env, info, rate_limit),
         ExecuteMsg::Origin(origin) => execute_origin(deps, env, info, origin),
+        ExecuteMsg::Owner(owner) => execute_owner(deps, env, info, owner),
     }
+}
+
+pub fn execute_owner(
+    deps: DepsMut,
+    _env: Env,
+    info: MessageInfo,
+    owner: Addr,
+) -> Result<Response, ContractError> {
+    is_owner(deps.storage, info.sender)?;
+    ORIGIN.save(deps.storage, &owner)?;
+    Ok(Response::default()
+        .add_attribute("method", "execute_owner")
+        .add_attribute("owner", owner))
 }
 
 pub fn execute_receive_nft(

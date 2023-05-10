@@ -9,6 +9,7 @@ pub struct InstantiateMsg {
 
 #[cw_serde]
 pub enum ExecuteMsg {
+    Owner(Addr),
     ReceiveNft(cw721::Cw721ReceiveMsg),
     AddToWhitelist { code_id: u64 },
     RemoveFromWhitelist { code_id: u64 },
