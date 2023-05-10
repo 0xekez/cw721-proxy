@@ -1,5 +1,6 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
 
+use cosmwasm_std::Addr;
 use cw_rate_limiter::Rate;
 
 #[cw_serde]
@@ -11,6 +12,8 @@ pub struct InstantiateMsg {
 #[cw_serde]
 pub enum ExecuteMsg {
     ReceiveNft(cw721::Cw721ReceiveMsg),
+    RateLimit(Rate),
+    Origin(Addr),
 }
 
 #[cw_serde]

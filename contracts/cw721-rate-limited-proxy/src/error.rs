@@ -6,6 +6,9 @@ pub enum ContractError {
     #[error(transparent)]
     Std(#[from] StdError),
 
+    #[error("Unauthorized addr {addr}")]
+    Unauthorized { addr: String },
+
     #[error(transparent)]
     Rate(#[from] cw_rate_limiter::RateLimitError),
 

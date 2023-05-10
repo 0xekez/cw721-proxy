@@ -1,7 +1,7 @@
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
-    to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, WasmMsg,
+    to_binary, Addr, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, Storage, WasmMsg,
 };
 use cw2::set_contract_version;
 use cw721_proxy::ProxyExecuteMsg;
@@ -10,7 +10,7 @@ use cw_rate_limiter::Rate;
 
 use crate::error::ContractError;
 use crate::msg::{ExecuteMsg, InstantiateMsg, MigrateMsg, QueryMsg};
-use crate::state::{ORIGIN, RATE_LIMIT};
+use crate::state::{ORIGIN, OWNER, RATE_LIMIT};
 
 const CONTRACT_NAME: &str = "crates.io:cw721-proxy-rate-limit";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -23,6 +23,7 @@ pub fn instantiate(
     msg: InstantiateMsg,
 ) -> Result<Response, ContractError> {
     set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
+    OWNER.save(deps.storage, &info.sender)?;
     ORIGIN.save(
         deps.storage,
         &msg.origin
@@ -45,6 +46,15 @@ pub fn instantiate(
     }
 }
 
+pub fn is_owner(storage: &dyn Storage, addr: &Addr) -> Result<(), ContractError> {
+    if addr != &OWNER.load(storage).unwrap() {
+        return Err(ContractError::Unauthorized {
+            addr: addr.to_string(),
+        });
+    }
+    Ok(())
+}
+
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn execute(
     deps: DepsMut,
@@ -54,6 +64,8 @@ pub fn execute(
 ) -> Result<Response, ContractError> {
     match msg {
         ExecuteMsg::ReceiveNft(msg) => execute_receive_nft(deps, env, info, msg),
+        ExecuteMsg::RateLimit(rate_limit) => execute_rate_limit(deps, env, &info, rate_limit),
+        ExecuteMsg::Origin(origin) => execute_origin(deps, env, &info, origin),
     }
 }
 
@@ -87,7 +99,43 @@ pub fn execute_receive_nft(
         })?,
         funds: vec![],
     };
-    Ok(Response::default().add_messages(vec![transfer_nft_msg, receive_msg]))}
+    Ok(Response::default().add_messages(vec![transfer_nft_msg, receive_msg]))
+}
+
+pub fn execute_rate_limit(
+    deps: DepsMut,
+    _env: Env,
+    info: &MessageInfo,
+    rate_limit: Rate,
+) -> Result<Response, ContractError> {
+    is_owner(deps.storage, &info.sender)?;
+    if rate_limit.is_zero() {
+        Err(ContractError::ZeroRate {})
+    } else {
+        RATE_LIMIT.init(deps.storage, &rate_limit)?;
+        let (rate, units) = match rate_limit {
+            Rate::PerBlock(rate) => (rate, "nfts_per_block"),
+            Rate::Blocks(rate) => (rate, "blocks_per_nft"),
+        };
+        Ok(Response::default()
+            .add_attribute("method", "execute_rate_limit")
+            .add_attribute("rate", rate.to_string())
+            .add_attribute("units", units))
+    }
+}
+
+pub fn execute_origin(
+    deps: DepsMut,
+    _env: Env,
+    info: &MessageInfo,
+    origin: Addr,
+) -> Result<Response, ContractError> {
+    is_owner(deps.storage, &info.sender)?;
+    ORIGIN.save(deps.storage, &origin)?;
+    Ok(Response::default()
+        .add_attribute("method", "execute_origin")
+        .add_attribute("origin", origin))
+}
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
