@@ -12,6 +12,7 @@ pub enum ExecuteMsg {
     ReceiveNft(cw721::Cw721ReceiveMsg),
     AddToWhitelist { code_id: u64 },
     RemoveFromWhitelist { code_id: u64 },
+    Origin(Addr),
 }
 
 #[cw_serde]

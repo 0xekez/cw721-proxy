@@ -24,13 +24,14 @@ pub fn instantiate(
 ) -> Result<Response, ContractError> {
     set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
     OWNER.save(deps.storage, &info.sender)?;
-    ORIGIN.save(
-        deps.storage,
-        &msg.origin
-            .map(|a| deps.api.addr_validate(&a))
-            .transpose()?
-            .unwrap_or(info.sender),
-    )?;
+
+    let origin = msg
+        .origin
+        .map(|a| deps.api.addr_validate(&a))
+        .transpose()?
+        .unwrap_or(info.sender);
+    ORIGIN.save(deps.storage, &origin)?;
+
     if msg.rate_limit.is_zero() {
         Err(ContractError::ZeroRate {})
     } else {
@@ -42,7 +43,8 @@ pub fn instantiate(
         Ok(Response::default()
             .add_attribute("method", "instantiate")
             .add_attribute("rate", rate.to_string())
-            .add_attribute("units", units))
+            .add_attribute("units", units)
+            .add_attribute("origin", origin))
     }
 }
 

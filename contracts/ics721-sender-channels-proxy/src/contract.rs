@@ -35,15 +35,30 @@ pub fn instantiate(
 ) -> Result<Response, ContractError> {
     set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
     OWNER.save(deps.storage, &info.sender)?;
+
     let origin = msg
         .origin
         .map(|a| deps.api.addr_validate(&a))
         .transpose()?
         .unwrap_or(info.sender);
     ORIGIN.save(deps.storage, &origin)?;
+
+    if let Some(list) = msg.whitelist.clone() {
+        list.iter()
+            .map(|item| {
+                deps.api.addr_validate(item.sender.as_str())?;
+                SENDER_TO_CHANNELS.save(deps.storage, item.sender.to_string(), &item.channels)
+            })
+            .collect::<StdResult<Vec<_>>>()?;
+    }
+
     Ok(Response::default()
         .add_attribute("method", "instantiate")
-        .add_attribute("origin", origin))
+        .add_attribute("origin", origin)
+        .add_attribute(
+            "whitelist",
+            format!("{:?}", msg.whitelist.unwrap_or_default()),
+        ))
 }
 
 pub fn is_owner(storage: &dyn Storage, addr: &Addr) -> Result<(), ContractError> {
@@ -70,6 +85,7 @@ pub fn execute(
         ExecuteMsg::RemoveFromWhitelist { sender } => {
             execute_remove_from_whitelist(deps, env, info, sender)
         }
+        ExecuteMsg::Origin(origin) => execute_origin(deps, env, &info, origin),
     }
 }
 
@@ -140,6 +156,19 @@ pub fn execute_receive_nft(
         funds: vec![],
     };
     Ok(Response::default().add_messages(vec![transfer_nft_msg, receive_msg]))
+}
+
+pub fn execute_origin(
+    deps: DepsMut,
+    _env: Env,
+    info: &MessageInfo,
+    origin: Addr,
+) -> Result<Response, ContractError> {
+    is_owner(deps.storage, &info.sender)?;
+    ORIGIN.save(deps.storage, &origin)?;
+    Ok(Response::default()
+        .add_attribute("method", "execute_origin")
+        .add_attribute("origin", origin))
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]

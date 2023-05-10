@@ -39,10 +39,16 @@ pub fn instantiate(
         .transpose()?
         .unwrap_or(info.sender);
     ORIGIN.save(deps.storage, &origin)?;
-    WHITELIST.init(deps, msg.whitelist)?;
+
+    WHITELIST.init(deps, msg.whitelist.clone())?;
+
     Ok(Response::default()
         .add_attribute("method", "instantiate")
-        .add_attribute("origin", origin))
+        .add_attribute("origin", origin)
+        .add_attribute(
+            "whitelist",
+            format!("{:?}", msg.whitelist.unwrap_or_default()),
+        ))
 }
 
 pub fn is_owner(storage: &dyn Storage, addr: &Addr) -> Result<(), ContractError> {
@@ -69,6 +75,7 @@ pub fn execute(
         ExecuteMsg::RemoveFromWhitelist { channel } => {
             execute_remove_from_whitelist(deps, env, info, &channel)
         }
+        ExecuteMsg::Origin(origin) => execute_origin(deps, env, &info, origin),
     }
 }
 
@@ -135,6 +142,19 @@ pub fn execute_receive_nft(
         funds: vec![],
     };
     Ok(Response::default().add_messages(vec![transfer_nft_msg, receive_msg]))
+}
+
+pub fn execute_origin(
+    deps: DepsMut,
+    _env: Env,
+    info: &MessageInfo,
+    origin: Addr,
+) -> Result<Response, ContractError> {
+    is_owner(deps.storage, &info.sender)?;
+    ORIGIN.save(deps.storage, &origin)?;
+    Ok(Response::default()
+        .add_attribute("method", "execute_origin")
+        .add_attribute("origin", origin))
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]

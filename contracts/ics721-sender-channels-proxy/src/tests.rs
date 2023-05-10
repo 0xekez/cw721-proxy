@@ -43,6 +43,7 @@ impl Test {
                 minter.clone(),
                 &InstantiateMsg {
                     origin: Some(mock_receiver.to_string()),
+                    whitelist: None,
                 },
                 &[],
                 "sender_whitelist",
@@ -206,6 +207,7 @@ fn test_origin_specified() {
             Addr::unchecked("ark_protocol"),
             &InstantiateMsg {
                 origin: Some("ark_protocol".to_string()),
+                whitelist: None,
             },
             &[],
             "only whitelisted addresses are alllowed",

@@ -18,6 +18,7 @@ pub enum ExecuteMsg {
     RemoveFromWhitelist {
         sender: String,
     },
+    Origin(Addr),
 }
 
 #[cw_serde]

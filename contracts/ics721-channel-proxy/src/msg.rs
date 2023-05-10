@@ -12,9 +12,14 @@ pub enum ExecuteMsg {
     /// Incoming msg from CW721 contract for ICS721 transfer.
     ReceiveNft(cw721::Cw721ReceiveMsg),
     /// Add channel to whitelist.
-    AddToWhitelist { channel: String },
+    AddToWhitelist {
+        channel: String,
+    },
     /// Remove channel from whitelist.
-    RemoveFromWhitelist { channel: String },
+    RemoveFromWhitelist {
+        channel: String,
+    },
+    Origin(Addr),
 }
 
 #[cw_serde]

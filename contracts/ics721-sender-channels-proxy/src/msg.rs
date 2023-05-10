@@ -4,6 +4,7 @@ use cosmwasm_std::{Addr, IbcTimeout};
 #[cw_serde]
 pub struct InstantiateMsg {
     pub origin: Option<String>,
+    pub whitelist: Option<Vec<SenderToChannelsResponse>>,
 }
 
 #[cw_serde]
@@ -16,7 +17,10 @@ pub enum ExecuteMsg {
         channels: Vec<String>,
     },
     /// Add CW721 conract and channels to whitelist.
-    RemoveFromWhitelist { sender: String },
+    RemoveFromWhitelist {
+        sender: String,
+    },
+    Origin(Addr),
 }
 
 #[cw_serde]
