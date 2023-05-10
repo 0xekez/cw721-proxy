@@ -64,15 +64,30 @@ pub fn execute_receive_nft(
     msg: cw721::Cw721ReceiveMsg,
 ) -> Result<Response, ContractError> {
     RATE_LIMIT.limit(deps.storage, &env, info.sender.as_str())?;
-    Ok(Response::default().add_message(WasmMsg::Execute {
+    // transfer NFT to ICS721
+    let cw721::Cw721ReceiveMsg {
+        token_id,
+        sender: _,
+        msg: _,
+    } = msg.clone();
+    let transfer_nft_msg = WasmMsg::Execute {
+        contract_addr: info.sender.to_string(), // sender is collection
+        msg: to_binary(&cw721::Cw721ExecuteMsg::TransferNft {
+            recipient: ORIGIN.load(deps.storage)?.into_string(),
+            token_id,
+        })?,
+        funds: vec![],
+    };
+    // forward Cw721ReceiveMsg to ICS721
+    let receive_msg = WasmMsg::Execute {
         contract_addr: ORIGIN.load(deps.storage)?.into_string(),
         msg: to_binary(&ProxyExecuteMsg::ReceiveProxyNft {
             eyeball: info.sender.into_string(),
             msg,
         })?,
         funds: vec![],
-    }))
-}
+    };
+    Ok(Response::default().add_messages(vec![transfer_nft_msg, receive_msg]))}
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
