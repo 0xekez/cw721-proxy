@@ -1,0 +1,10 @@
+[package]
+name = "ibc-outgoing-msg"
+license = "BSD-3"
+authors = ["Mr T <mr-t@arkprotocol.io>"]
+edition = "2021"
+version = "0.0.1"
+
+[dependencies]
+cosmwasm-schema = "1.1"
+cosmwasm-std = "1.1"

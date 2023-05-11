@@ -12,9 +12,9 @@ use cosmwasm_std::WasmMsg;
 use cosmwasm_std::{DepsMut, Env, MessageInfo};
 use cw2::set_contract_version;
 use cw721_proxy::ProxyExecuteMsg;
+use ibc_outgoing_msg::IbcOutgoingMsg;
 
 use crate::msg::ExecuteMsg;
-use crate::msg::IbcOutgoingMsg;
 use crate::msg::MigrateMsg;
 use crate::msg::QueryMsg;
 use crate::state::ORIGIN;

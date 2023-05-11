@@ -1,9 +1,10 @@
 use cosmwasm_std::{to_binary, Addr, Empty, IbcTimeout, IbcTimeoutBlock, StdResult};
 use cw_multi_test::{App, AppResponse, Contract, ContractWrapper, Executor};
+use ibc_outgoing_msg::IbcOutgoingMsg;
 
 use crate::{
     error::ContractError,
-    msg::{ExecuteMsg, IbcOutgoingMsg, InstantiateMsg, QueryMsg},
+    msg::{ExecuteMsg, InstantiateMsg, QueryMsg},
 };
 
 struct Test {

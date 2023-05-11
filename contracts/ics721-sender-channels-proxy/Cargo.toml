@@ -24,6 +24,7 @@ cw721 = "0.16"
 cw721-proxy = { path = "../../packages/cw721-proxy", version = "*" }
 cw721-proxy-derive = { path = "../../packages/cw721-proxy-derive", version = "*" }
 cw721-whitelist-map = { path = "../../packages/cw721-whitelist-map", version = "*" }
+ibc-outgoing-msg = { path = "../../packages/ibc-outgoing-msg", version = "*" }
 thiserror = "1"
 
 [dev-dependencies]

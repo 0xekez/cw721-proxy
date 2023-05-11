@@ -669,6 +669,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "ibc-outgoing-msg"
+version = "0.0.1"
+dependencies = [
+ "cosmwasm-schema",
+ "cosmwasm-std",
+]
+
+[[package]]
 name = "ics721-channel-proxy"
 version = "0.0.1"
 dependencies = [
@@ -684,6 +692,7 @@ dependencies = [
  "cw721-proxy-derive",
  "cw721-proxy-tester",
  "cw721-whitelist",
+ "ibc-outgoing-msg",
  "rand",
  "thiserror",
 ]
@@ -704,6 +713,7 @@ dependencies = [
  "cw721-proxy-derive",
  "cw721-proxy-tester",
  "cw721-whitelist-map",
+ "ibc-outgoing-msg",
  "rand",
  "thiserror",
 ]
