@@ -1,4 +1,5 @@
 use cosmwasm_std::{to_binary, Addr, Empty, IbcTimeout, IbcTimeoutBlock, StdResult};
+use cw_ics721_governance::ContractError as GovernanceContractError;
 use cw_multi_test::{App, AppResponse, Contract, ContractWrapper, Executor};
 use ibc_outgoing_msg::IbcOutgoingMsg;
 
@@ -246,9 +247,9 @@ fn add_to_whitelist_unauthorized() {
         .unwrap();
     assert_eq!(
         err,
-        ContractError::Unauthorized {
+        ContractError::GovernanceError(GovernanceContractError::Unauthorized {
             addr: "unauthorized".to_string()
-        }
+        })
     )
 }
 
@@ -269,9 +270,9 @@ fn remove_from_whitelist_unauthorized() {
         .unwrap();
     assert_eq!(
         err,
-        ContractError::Unauthorized {
+        ContractError::GovernanceError(GovernanceContractError::Unauthorized {
             addr: "unauthorized".to_string()
-        }
+        })
     )
 }
 

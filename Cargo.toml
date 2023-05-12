@@ -13,9 +13,11 @@ cw2 = "0.16"
 cw721 = "0.16"
 cw721-proxy = { path = "./packages/cw721-proxy", version = "*" }
 cw721-proxy-derive = { path = "./packages/cw721-proxy-derive", version = "*" }
-cw-rate-limiter = { path = "./packages/cw-rate-limiter", version = "*" }
 cw721-whitelist = { path = "./packages/cw721-whitelist", version = "*" }
 cw721-whitelist-map = { path = "./packages/cw721-whitelist-map", version = "*" }
+cw-ics721-governance = { path = "./packages/cw-ics721-governance", version = "*" }
+cw-rate-limiter = { path = "./packages/cw-rate-limiter", version = "*" }
+cw-utils = "0.16.0"
 ibc-outgoing-msg = { path = "./packages/ibc-outgoing-msg", version = "*" }
 schemars = "0.8.11"
 proc-macro2 = "1.0"

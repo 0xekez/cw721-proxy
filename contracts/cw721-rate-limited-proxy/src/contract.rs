@@ -1,7 +1,7 @@
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
-    to_binary, Addr, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, Storage, WasmMsg,
+    to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, WasmMsg,
 };
 use cw2::set_contract_version;
 use cw721_proxy::ProxyExecuteMsg;
@@ -10,7 +10,8 @@ use cw_rate_limiter::Rate;
 
 use crate::error::ContractError;
 use crate::msg::{ExecuteMsg, InstantiateMsg, MigrateMsg, QueryMsg};
-use crate::state::{ORIGIN, OWNER, RATE_LIMIT};
+use crate::state::GOVERNANCE;
+use crate::state::RATE_LIMIT;
 
 const CONTRACT_NAME: &str = "crates.io:cw721-proxy-rate-limit";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -23,14 +24,14 @@ pub fn instantiate(
     msg: InstantiateMsg,
 ) -> Result<Response, ContractError> {
     set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
-    OWNER.save(deps.storage, &info.sender)?;
+    GOVERNANCE.save_owner(deps.storage, &Some(info.sender.clone()))?;
 
     let origin = msg
         .origin
         .map(|a| deps.api.addr_validate(&a))
         .transpose()?
         .unwrap_or(info.sender);
-    ORIGIN.save(deps.storage, &origin)?;
+    GOVERNANCE.save_origin(deps.storage, &origin)?;
 
     if msg.rate_limit.is_zero() {
         Err(ContractError::ZeroRate {})
@@ -46,15 +47,6 @@ pub fn instantiate(
             .add_attribute("units", units)
             .add_attribute("origin", origin))
     }
-}
-
-pub fn is_owner(storage: &dyn Storage, addr: Addr) -> Result<(), ContractError> {
-    if addr != OWNER.load(storage).unwrap() {
-        return Err(ContractError::Unauthorized {
-            addr: addr.to_string(),
-        });
-    }
-    Ok(())
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
@@ -78,9 +70,9 @@ pub fn execute_owner(
     info: MessageInfo,
     addr: String,
 ) -> Result<Response, ContractError> {
-    let addr = deps.api.addr_validate(&addr)?;
-    is_owner(deps.storage, info.sender)?;
-    ORIGIN.save(deps.storage, &addr)?;
+    GOVERNANCE.is_owner(deps.storage, info.sender)?;
+    let owner = deps.api.addr_validate(&addr)?;
+    GOVERNANCE.save_owner(deps.storage, &Some(owner))?;
     Ok(Response::default()
         .add_attribute("method", "execute_owner")
         .add_attribute("owner", addr))
@@ -102,14 +94,14 @@ pub fn execute_receive_nft(
     let transfer_nft_msg = WasmMsg::Execute {
         contract_addr: info.sender.to_string(), // sender is collection
         msg: to_binary(&cw721::Cw721ExecuteMsg::TransferNft {
-            recipient: ORIGIN.load(deps.storage)?.into_string(),
+            recipient: GOVERNANCE.load_origin(deps.storage)?.into_string(),
             token_id,
         })?,
         funds: vec![],
     };
     // forward Cw721ReceiveMsg to ICS721
     let receive_msg = WasmMsg::Execute {
-        contract_addr: ORIGIN.load(deps.storage)?.into_string(),
+        contract_addr: GOVERNANCE.load_origin(deps.storage)?.into_string(),
         msg: to_binary(&ProxyExecuteMsg::ReceiveProxyNft {
             eyeball: info.sender.into_string(),
             msg,
@@ -125,7 +117,7 @@ pub fn execute_rate_limit(
     info: MessageInfo,
     rate_limit: Rate,
 ) -> Result<Response, ContractError> {
-    is_owner(deps.storage, info.sender)?;
+    GOVERNANCE.is_owner(deps.storage, info.sender)?;
     if rate_limit.is_zero() {
         Err(ContractError::ZeroRate {})
     } else {
@@ -148,8 +140,8 @@ pub fn execute_origin(
     addr: String,
 ) -> Result<Response, ContractError> {
     let addr = deps.api.addr_validate(&addr)?;
-    is_owner(deps.storage, info.sender)?;
-    ORIGIN.save(deps.storage, &addr)?;
+    GOVERNANCE.is_owner(deps.storage, info.sender)?;
+    GOVERNANCE.save_origin(deps.storage, &addr)?;
     Ok(Response::default()
         .add_attribute("method", "execute_origin")
         .add_attribute("origin", addr))
@@ -158,8 +150,8 @@ pub fn execute_origin(
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
-        QueryMsg::Owner {} => to_binary(&OWNER.may_load(deps.storage)?),
-        QueryMsg::Origin {} => to_binary(&ORIGIN.may_load(deps.storage)?),
+        QueryMsg::Owner {} => to_binary(&GOVERNANCE.load_owner(deps.storage)?),
+        QueryMsg::Origin {} => to_binary(&GOVERNANCE.load_origin(deps.storage)?),
         QueryMsg::RateLimit {} => to_binary(&RATE_LIMIT.query_limit(deps.storage)?),
     }
 }
@@ -180,7 +172,7 @@ pub fn migrate(deps: DepsMut, _env: Env, msg: MigrateMsg) -> Result<Response, Co
             }
             if let Some(origin) = origin {
                 let origin = deps.api.addr_validate(&origin)?;
-                ORIGIN.save(deps.storage, &origin)?;
+                GOVERNANCE.save_origin(deps.storage, &origin)?;
             }
             Ok(Response::default().add_attribute("method", "migrate"))
         }

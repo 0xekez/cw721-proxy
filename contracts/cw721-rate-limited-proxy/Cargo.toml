@@ -23,6 +23,7 @@ cw721 = { workspace = true }
 cw721-proxy = { workspace = true }
 cw721-proxy-derive = { workspace = true }
 cw-rate-limiter = { workspace = true }
+cw-ics721-governance = { workspace = true }
 thiserror = { workspace = true }
 
 [dev-dependencies]

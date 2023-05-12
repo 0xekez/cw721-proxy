@@ -1,8 +1,5 @@
-use cosmwasm_std::Addr;
-use cw_storage_plus::Item;
-
 use crate::WhiteList;
+use cw_ics721_governance::Governance;
 
-pub const OWNER: Item<Addr> = Item::new("owner");
-pub const ORIGIN: Item<Addr> = Item::new("origin");
+pub const GOVERNANCE: Governance = Governance::new();
 pub const WHITELIST: WhiteList<u64> = WhiteList::new();

@@ -1,4 +1,5 @@
 use cosmwasm_std::{to_binary, Addr, Empty, StdResult};
+use cw_ics721_governance::ContractError as GovernanceContractError;
 use cw_multi_test::{App, AppResponse, Contract, ContractWrapper, Executor};
 
 use crate::{
@@ -232,9 +233,9 @@ fn add_to_whitelist_unauthorized() {
         .unwrap();
     assert_eq!(
         err,
-        ContractError::Unauthorized {
+        ContractError::GovernanceError(GovernanceContractError::Unauthorized {
             addr: "unauthorized".to_string()
-        }
+        })
     )
 }
 
@@ -255,9 +256,9 @@ fn remove_from_whitelist_unauthorized() {
         .unwrap();
     assert_eq!(
         err,
-        ContractError::Unauthorized {
+        ContractError::GovernanceError(GovernanceContractError::Unauthorized {
             addr: "unauthorized".to_string()
-        }
+        })
     )
 }
 
@@ -296,8 +297,8 @@ fn send_unauthorized_sender() {
         .unwrap();
     assert_eq!(
         err,
-        ContractError::Unauthorized {
+        ContractError::GovernanceError(GovernanceContractError::Unauthorized {
             addr: test.cw721s[0].clone().to_string()
-        }
+        })
     )
 }

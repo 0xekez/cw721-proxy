@@ -195,6 +195,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "cw-ics721-governance"
+version = "0.0.1"
+dependencies = [
+ "cosmwasm-std",
+ "cw-storage-plus",
+ "cw-utils",
+ "cw721-base",
+ "thiserror",
+]
+
+[[package]]
 name = "cw-multi-test"
 version = "0.16.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -301,6 +312,7 @@ dependencies = [
  "anyhow",
  "cosmwasm-schema",
  "cosmwasm-std",
+ "cw-ics721-governance",
  "cw-multi-test",
  "cw-storage-plus",
  "cw2",
@@ -358,6 +370,7 @@ dependencies = [
  "anyhow",
  "cosmwasm-schema",
  "cosmwasm-std",
+ "cw-ics721-governance",
  "cw-multi-test",
  "cw-rate-limiter",
  "cw-storage-plus",
@@ -378,6 +391,7 @@ dependencies = [
  "anyhow",
  "cosmwasm-schema",
  "cosmwasm-std",
+ "cw-ics721-governance",
  "cw-multi-test",
  "cw-storage-plus",
  "cw2",
@@ -602,6 +616,7 @@ dependencies = [
  "anyhow",
  "cosmwasm-schema",
  "cosmwasm-std",
+ "cw-ics721-governance",
  "cw-multi-test",
  "cw-storage-plus",
  "cw2",
@@ -623,6 +638,7 @@ dependencies = [
  "anyhow",
  "cosmwasm-schema",
  "cosmwasm-std",
+ "cw-ics721-governance",
  "cw-multi-test",
  "cw-storage-plus",
  "cw2",
