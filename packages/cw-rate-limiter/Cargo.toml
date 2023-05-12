@@ -6,9 +6,9 @@ edition = "2021"
 version = "0.0.1"
 
 [dependencies]
-cosmwasm-std = "1.1"
-cosmwasm-schema = "1.1"
-cw-storage-plus = "0.16"
-thiserror = "1"
-schemars = "0.8.11"
-serde = "1.0"
+cosmwasm-std = { workspace = true }
+cosmwasm-schema = { workspace = true }
+cw-storage-plus = { workspace = true }
+thiserror = { workspace = true }
+schemars = { workspace = true }
+serde = { workspace = true }
