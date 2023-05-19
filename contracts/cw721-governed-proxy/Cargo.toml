@@ -1,0 +1,28 @@
+[package]
+name = "cw721-governed-proxy"
+license = "BSD-3"
+authors = ["Mr T <mr-t@arkprotocol.io>"]
+edition = "2021"
+version = "0.0.1"
+
+[features]
+# use library feature to disable all instantiate/execute/query exports
+library = []
+
+[dependencies]
+cosmwasm-std = { workspace = true }
+cosmwasm-schema = { workspace = true }
+cw2 = { workspace = true }
+cw721 = { workspace = true }
+cw721-base = { workspace = true }
+cw721-proxy = { workspace = true }
+cw-storage-plus = { workspace = true }
+cw-utils = { workspace = true }
+ibc-outgoing-msg = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+cw-multi-test = { workspace = true }
+cw721-governed-proxy-multi-test = { workspace = true, features = ["library"] }
+cw721-proxy-tester = { workspace = true }
+anyhow = { workspace = true }

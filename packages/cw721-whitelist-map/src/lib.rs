@@ -1,6 +1,6 @@
+use cosmwasm_schema::serde::{de::DeserializeOwned, Serialize};
 use cosmwasm_std::{StdResult, Storage};
 use cw_storage_plus::{KeyDeserialize, Map, PrimaryKey};
-use serde::{de::DeserializeOwned, Serialize};
 
 pub struct WhiteListMap<'a, K, T> {
     pub map: Map<'a, K, T>,
@@ -25,6 +25,10 @@ where
         self.map.load(storage, key)
     }
 
+    pub fn may_load(&self, storage: &dyn Storage, key: K) -> StdResult<Option<T>> {
+        self.map.may_load(storage, key)
+    }
+
     pub fn query_is_whitelisted<P>(
         &self,
         storage: &dyn Storage,
@@ -34,9 +38,10 @@ where
     where
         P: FnMut(T) -> bool,
     {
-        let value = self.load(storage, key)?;
-        let valid = predicate(value);
-        Ok(valid)
+        match self.may_load(storage, key)? {
+            Some(value) => Ok(predicate(value)),
+            None => Ok(false),
+        }
     }
 
     pub fn save(&self, storage: &mut dyn Storage, key: K, value: &T) -> StdResult<()> {

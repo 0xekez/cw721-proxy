@@ -1,12 +1,12 @@
+use cosmwasm_schema::serde::{de::DeserializeOwned, Serialize};
 use cosmwasm_std::{DepsMut, StdResult, Storage};
 use cw_storage_plus::Item;
-use serde::{de::DeserializeOwned, Serialize};
 
-pub struct WhiteList<'a, T> {
+pub struct Whitelist<'a, T> {
     whitelist: Item<'a, Vec<T>>,
 }
 
-impl<'a, T> WhiteList<'a, T>
+impl<'a, T> Whitelist<'a, T>
 where
     T: Serialize + DeserializeOwned + PartialEq + Clone,
 {
@@ -22,7 +22,10 @@ where
     }
 
     pub fn query_whitelist(&self, storage: &dyn Storage) -> StdResult<Vec<T>> {
-        self.whitelist.load(storage)
+        match self.whitelist.may_load(storage).unwrap_or(None) {
+            Some(e) => Ok(e),
+            None => Ok(vec![]),
+        }
     }
 
     pub fn query_is_whitelisted(&self, storage: &dyn Storage, value: &T) -> StdResult<bool> {

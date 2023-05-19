@@ -1,0 +1,37 @@
+[package]
+name = "cw721-governed-channel-proxy"
+authors = ["Mr T <mr-t@arkprotocol>"]
+edition = "2021"
+version = "0.0.1"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+# for more explicit tests, cargo test --features=backtraces
+backtraces = ["cosmwasm-std/backtraces"]
+# use library feature to disable all instantiate/execute/query exports
+library = []
+
+[dependencies]
+cosmwasm-std = { workspace = true }
+cosmwasm-schema = { workspace = true }
+cw-storage-plus = { workspace = true }
+cw2 = { workspace = true }
+cw721 = { workspace = true }
+cw721-proxy = { workspace = true }
+cw721-proxy-derive = { workspace = true }
+cw721-whitelist = { workspace = true }
+cw721-governed-proxy = { workspace = true, features = ["library"] }
+ibc-outgoing-msg = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+cw-multi-test = { workspace = true }
+cw721-base = { workspace = true }
+cw721-proxy-tester = { workspace = true }
+cw721-governed-proxy-multi-test = { workspace = true, features = ["library"] }
+rand = { workspace = true }
+anyhow = { workspace = true }

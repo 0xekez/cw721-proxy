@@ -15,10 +15,11 @@ cw721-proxy = { path = "./packages/cw721-proxy", version = "*" }
 cw721-proxy-derive = { path = "./packages/cw721-proxy-derive", version = "*" }
 cw721-whitelist = { path = "./packages/cw721-whitelist", version = "*" }
 cw721-whitelist-map = { path = "./packages/cw721-whitelist-map", version = "*" }
-cw-ics721-governance = { path = "./packages/cw-ics721-governance", version = "*" }
+cw721-governed-proxy = { path = "./contracts/cw721-governed-proxy", version = "*" }
 cw-rate-limiter = { path = "./packages/cw-rate-limiter", version = "*" }
 cw-utils = "0.16.0"
 ibc-outgoing-msg = { path = "./packages/ibc-outgoing-msg", version = "*" }
+cw721-governed-proxy-multi-test = { path = "./packages/cw721-governed-proxy-multi-test", version = "*" }
 schemars = "0.8.11"
 proc-macro2 = "1.0"
 quote = "1.0"
@@ -26,7 +27,7 @@ serde = "1.0"
 syn = { version = "1.0", features = ["derive"] }
 thiserror = "1"
 # dev dependencies
-cw-multi-test = "0.16.0"
+cw-multi-test = "0.16.4"
 cw721-base = "0.16"
 cw721-proxy-tester = { path = "./debug/cw721-proxy-tester", version = "*" }
 rand = "0.8"
