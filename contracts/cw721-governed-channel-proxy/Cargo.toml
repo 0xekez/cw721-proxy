@@ -1,10 +1,9 @@
 [package]
 name = "cw721-governed-channel-proxy"
-authors = ["Mr T <mr-t@arkprotocol>"]
+license = "BSD-3"
+authors = ["Mr T <mr-t@arkprotocol.io>"]
 edition = "2021"
 version = "0.0.1"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lib]
 crate-type = ["cdylib", "rlib"]
