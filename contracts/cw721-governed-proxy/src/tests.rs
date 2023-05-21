@@ -1,5 +1,5 @@
 use cosmwasm_std::{coin, to_binary, Addr, Coin, Empty};
-use cw721_governed_proxy_multi_test::Test as GovernedMultiTest;
+use cw721_proxy_multi_test::Test as GovernedMultiTest;
 use cw_multi_test::{App, Contract, ContractWrapper, Executor};
 
 use crate::{
@@ -20,9 +20,13 @@ pub struct Test {
 }
 
 impl Test {
-    pub fn new(cw721s: usize, transfer_fee: Option<Coin>) -> Self {
+    pub fn new(cw721s: usize, transfer_fee: Option<Coin>, set_owner: bool) -> Self {
         let mut governed_multi_test = GovernedMultiTest::new(cw721s, transfer_fee);
         let proxy_code_id = governed_multi_test.app.store_code(proxy_code());
+        let owner = match set_owner {
+            true => Some(governed_multi_test.minter.to_string()),
+            false => None,
+        };
         let proxy = governed_multi_test
             .app
             .instantiate_contract(
@@ -30,6 +34,7 @@ impl Test {
                 governed_multi_test.minter.clone(),
                 &InstantiateMsg {
                     origin: Some(governed_multi_test.mock_receiver.to_string()),
+                    owner,
                     transfer_fee: governed_multi_test.transfer_fee.clone(),
                 },
                 &[],
@@ -48,25 +53,26 @@ impl Test {
 #[test]
 fn test_origin_specified() {
     let mut app = App::default();
-    let cw721_proxy_code_id = app.store_code(proxy_code());
+    let proxy_code_id = app.store_code(proxy_code());
 
-    let cw721_proxy = app
+    let proxy = app
         .instantiate_contract(
-            cw721_proxy_code_id,
+            proxy_code_id,
             Addr::unchecked("foo"),
             &InstantiateMsg {
                 origin: Some("ark_protocol".to_string()),
                 transfer_fee: None,
+                owner: None,
             },
             &[],
-            "only whitelisted addresses are alllowed",
+            "governed proxy",
             None,
         )
         .unwrap();
 
     let origin: Addr = app
         .wrap()
-        .query_wasm_smart(&cw721_proxy, &QueryMsg::Origin {})
+        .query_wasm_smart(&proxy, &QueryMsg::Origin {})
         .unwrap();
     assert_eq!(origin, Addr::unchecked("ark_protocol"));
 }
@@ -85,6 +91,7 @@ fn test_sender_is_origin() {
             &InstantiateMsg {
                 origin: None,
                 transfer_fee: None,
+                owner: None,
             },
             &[],
             "only whitelisted addresses are alllowed",
@@ -101,7 +108,7 @@ fn test_sender_is_origin() {
 
 #[test]
 fn execute_owner_authorized() {
-    let mut test = Test::new(1, None);
+    let mut test = Test::new(1, None, true);
     test.governed_multi_test
         .execute_owner(
             test.governed_multi_test.minter.clone(),
@@ -113,7 +120,7 @@ fn execute_owner_authorized() {
 
 #[test]
 fn execute_owner_unauthorized() {
-    let mut test = Test::new(1, None);
+    let mut test = Test::new(1, None, false);
     let err: ContractError = test
         .governed_multi_test
         .execute_owner(
@@ -134,7 +141,7 @@ fn execute_owner_unauthorized() {
 
 #[test]
 fn execute_origin_authorized() {
-    let mut test = Test::new(1, None);
+    let mut test = Test::new(1, None, true);
     test.governed_multi_test
         .execute_origin(
             test.governed_multi_test.minter.clone(),
@@ -146,7 +153,7 @@ fn execute_origin_authorized() {
 
 #[test]
 fn execute_origin_unauthorized() {
-    let mut test = Test::new(1, None);
+    let mut test = Test::new(1, None, false);
     let err: ContractError = test
         .governed_multi_test
         .execute_origin(
@@ -167,7 +174,7 @@ fn execute_origin_unauthorized() {
 
 #[test]
 fn send_funds_authorized() {
-    let mut test = Test::new(1, None);
+    let mut test = Test::new(1, None, true);
     test.governed_multi_test
         .send_funds(
             test.governed_multi_test.minter.clone(),
@@ -180,7 +187,7 @@ fn send_funds_authorized() {
 
 #[test]
 fn send_funds_unauthorized() {
-    let mut test = Test::new(1, None);
+    let mut test = Test::new(1, None, false);
     let err: ContractError = test
         .governed_multi_test
         .send_funds(
@@ -202,7 +209,7 @@ fn send_funds_unauthorized() {
 
 #[test]
 fn execute_transfer_fee_authorized() {
-    let mut test = Test::new(1, None);
+    let mut test = Test::new(1, None, true);
     test.governed_multi_test
         .execute_transfer_fee(
             test.governed_multi_test.minter.clone(),
@@ -214,7 +221,7 @@ fn execute_transfer_fee_authorized() {
 
 #[test]
 fn execute_transfer_fee_unauthorized() {
-    let mut test = Test::new(1, None);
+    let mut test = Test::new(1, None, false);
     let err: ContractError = test
         .governed_multi_test
         .execute_transfer_fee(test.governed_multi_test.other.clone(), test.proxy, None)
@@ -231,7 +238,7 @@ fn execute_transfer_fee_unauthorized() {
 
 #[test]
 fn bridge_nft_no_transfer_fee() {
-    let mut test = Test::new(1, None);
+    let mut test = Test::new(1, None, false);
     let token_id = test
         .governed_multi_test
         .mint(test.governed_multi_test.cw721s[0].clone())
@@ -277,7 +284,7 @@ fn bridge_nft_no_transfer_fee() {
 
 #[test]
 fn send_nft_no_transfer_fee() {
-    let mut test = Test::new(1, None);
+    let mut test = Test::new(1, None, false);
     let token_id = test
         .governed_multi_test
         .mint(test.governed_multi_test.cw721s[0].clone())
@@ -312,7 +319,7 @@ fn send_nft_no_transfer_fee() {
 
 #[test]
 fn bridge_nft_unapproved() {
-    let mut test = Test::new(1, None);
+    let mut test = Test::new(1, None, false);
     let token_id = test
         .governed_multi_test
         .mint(test.governed_multi_test.cw721s[0].clone())
@@ -344,7 +351,7 @@ fn bridge_nft_unapproved() {
 #[test]
 fn bridge_nft_no_payment() {
     let transfer_fee = coin(100, "uark");
-    let mut test = Test::new(1, Some(transfer_fee.clone()));
+    let mut test = Test::new(1, Some(transfer_fee.clone()), false);
     let token_id = test
         .governed_multi_test
         .mint(test.governed_multi_test.cw721s[0].clone())
@@ -380,7 +387,7 @@ fn bridge_nft_no_payment() {
 #[test]
 fn send_nft_no_payment() {
     let transfer_fee = coin(100, "uark");
-    let mut test = Test::new(1, Some(transfer_fee.clone()));
+    let mut test = Test::new(1, Some(transfer_fee.clone()), false);
     let token_id = test
         .governed_multi_test
         .mint(test.governed_multi_test.cw721s[0].clone())
@@ -409,7 +416,7 @@ fn send_nft_no_payment() {
 #[test]
 fn bridge_nft_correct_payment() {
     let transfer_fee = coin(100, "uark");
-    let mut test = Test::new(1, Some(transfer_fee.clone()));
+    let mut test = Test::new(1, Some(transfer_fee.clone()), false);
     let token_id = test
         .governed_multi_test
         .mint(test.governed_multi_test.cw721s[0].clone())
@@ -438,7 +445,7 @@ fn bridge_nft_correct_payment() {
 #[test]
 fn send_nft_correct_payment() {
     let transfer_fee = coin(100, "uark");
-    let mut test = Test::new(1, Some(transfer_fee.clone()));
+    let mut test = Test::new(1, Some(transfer_fee.clone()), false);
     let token_id = test
         .governed_multi_test
         .mint(test.governed_multi_test.cw721s[0].clone())
@@ -467,7 +474,7 @@ fn send_nft_correct_payment() {
 #[test]
 fn bridge_nft_insufficient_payment() {
     let transfer_fee = coin(100, "uark");
-    let mut test = Test::new(1, Some(transfer_fee.clone()));
+    let mut test = Test::new(1, Some(transfer_fee.clone()), false);
     let token_id = test
         .governed_multi_test
         .mint(test.governed_multi_test.cw721s[0].clone())
@@ -496,7 +503,7 @@ fn bridge_nft_insufficient_payment() {
 #[test]
 fn send_nft_insufficient_payment() {
     let transfer_fee = coin(100, "uark");
-    let mut test = Test::new(1, Some(transfer_fee.clone()));
+    let mut test = Test::new(1, Some(transfer_fee.clone()), false);
     let token_id = test
         .governed_multi_test
         .mint(test.governed_multi_test.cw721s[0].clone())
@@ -525,7 +532,7 @@ fn send_nft_insufficient_payment() {
 #[test]
 fn bridge_nft_higher_payment() {
     let transfer_fee = coin(100, "uark");
-    let mut test = Test::new(1, Some(transfer_fee.clone()));
+    let mut test = Test::new(1, Some(transfer_fee.clone()), false);
     let token_id = test
         .governed_multi_test
         .mint(test.governed_multi_test.cw721s[0].clone())
@@ -561,7 +568,7 @@ fn bridge_nft_higher_payment() {
 #[test]
 fn send_nft_higher_payment() {
     let transfer_fee = coin(100, "uark");
-    let mut test = Test::new(1, Some(transfer_fee.clone()));
+    let mut test = Test::new(1, Some(transfer_fee.clone()), false);
     let token_id = test
         .governed_multi_test
         .mint(test.governed_multi_test.cw721s[0].clone())

@@ -4,6 +4,7 @@ use cosmwasm_std::{Addr, Binary, Coin};
 #[cw_serde]
 pub struct InstantiateMsg {
     pub origin: Option<String>,
+    pub owner: Option<String>,
     pub transfer_fee: Option<Coin>,
     pub whitelist: Option<Vec<SenderToChannelsResponse>>,
 }

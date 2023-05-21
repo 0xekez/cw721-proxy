@@ -18,6 +18,7 @@ impl Cw721GovernedCollectionProxy<'_> {
                 info,
                 cw721_governed_proxy::msg::InstantiateMsg {
                     origin: msg.origin.clone(),
+                    owner: msg.owner.clone(),
                     transfer_fee: msg.transfer_fee.clone(),
                 },
             )?;
@@ -25,6 +26,7 @@ impl Cw721GovernedCollectionProxy<'_> {
         Ok(Response::default()
             .add_attribute("method", "instantiate")
             .add_attribute("origin", format!("{:?}", msg.origin))
+            .add_attribute("owner", format!("{:?}", msg.owner))
             .add_attribute("transfer_fee", format!("{:?}", msg.transfer_fee))
             .add_attribute("whitelist", format!("{:?}", msg.whitelist)))
     }

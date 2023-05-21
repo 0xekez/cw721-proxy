@@ -89,7 +89,9 @@ impl<'a> Cw721GovernanceProxy<'a> {
                 }
                 Ok(())
             }
-            None => Ok(()),
+            None => Err(ContractError::Unauthorized {
+                addr: addr.to_string(),
+            }),
         }
     }
 

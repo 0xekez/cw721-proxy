@@ -1,6 +1,6 @@
 use cosmwasm_std::{coin, to_binary, Addr, Coin, Empty};
 use cw721_governed_proxy::error::ContractError as GovernedContractError;
-use cw721_governed_proxy_multi_test::Test as GovernedMultiTest;
+use cw721_proxy_multi_test::Test as GovernedMultiTest;
 use cw_multi_test::{AppResponse, Contract, ContractWrapper, Executor};
 use cw_rate_limiter::Rate;
 
@@ -22,9 +22,18 @@ pub struct Test {
 }
 
 impl Test {
-    pub fn new(cw721s: usize, transfer_fee: Option<Coin>, rate_limit: Rate) -> Self {
+    pub fn new(
+        cw721s: usize,
+        transfer_fee: Option<Coin>,
+        rate_limit: Rate,
+        set_owner: bool,
+    ) -> Self {
         let mut governed_multi_test = GovernedMultiTest::new(cw721s, transfer_fee);
         let proxy_code_id = governed_multi_test.app.store_code(proxy_code());
+        let owner = match set_owner {
+            true => Some(governed_multi_test.minter.to_string()),
+            false => None,
+        };
         let proxy = governed_multi_test
             .app
             .instantiate_contract(
@@ -32,6 +41,7 @@ impl Test {
                 governed_multi_test.minter.clone(),
                 &InstantiateMsg {
                     origin: Some(governed_multi_test.mock_receiver.to_string()),
+                    owner,
                     transfer_fee: governed_multi_test.transfer_fee.clone(),
                     rate_limit,
                 },
@@ -89,7 +99,7 @@ impl Test {
 #[test]
 fn rate_limit_authorized() {
     let transfer_fee = Some(coin(100, "uark"));
-    let mut test = Test::new(1, transfer_fee, Rate::Blocks(1));
+    let mut test = Test::new(1, transfer_fee, Rate::Blocks(1), true);
     test.execute_rate_limit(test.governed_multi_test.minter.clone(), Rate::Blocks(1))
         .unwrap();
 }
@@ -97,7 +107,7 @@ fn rate_limit_authorized() {
 #[test]
 fn rate_limit_is_zero() {
     let transfer_fee = Some(coin(100, "uark"));
-    let mut test = Test::new(1, transfer_fee, Rate::Blocks(1));
+    let mut test = Test::new(1, transfer_fee, Rate::Blocks(1), true);
     let err: ContractError = test
         .execute_rate_limit(test.governed_multi_test.minter.clone(), Rate::PerBlock(0))
         .unwrap_err()
@@ -109,7 +119,7 @@ fn rate_limit_is_zero() {
 #[test]
 fn rate_limit_unauthorized() {
     let transfer_fee = Some(coin(100, "uark"));
-    let mut test = Test::new(1, transfer_fee, Rate::Blocks(1));
+    let mut test = Test::new(1, transfer_fee, Rate::Blocks(1), false);
     let err: ContractError = test
         .execute_rate_limit(Addr::unchecked("unauthorized"), Rate::Blocks(1))
         .unwrap_err()
@@ -127,7 +137,7 @@ fn rate_limit_unauthorized() {
 
 #[test]
 fn bridge_nft_no_transfer_fee() {
-    let mut test = Test::new(1, None, Rate::Blocks(1));
+    let mut test = Test::new(1, None, Rate::Blocks(1), true);
     let channel = "any";
     let token_id = test
         .governed_multi_test
@@ -172,7 +182,7 @@ fn bridge_nft_no_transfer_fee() {
 
 #[test]
 fn send_nft_no_transfer_fee() {
-    let mut test = Test::new(1, None, Rate::Blocks(1));
+    let mut test = Test::new(1, None, Rate::Blocks(1), true);
     let channel = "any";
     let token_id = test
         .governed_multi_test

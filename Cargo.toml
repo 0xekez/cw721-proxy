@@ -19,7 +19,7 @@ cw721-governed-proxy = { path = "./contracts/cw721-governed-proxy", version = "*
 cw-rate-limiter = { path = "./packages/cw-rate-limiter", version = "*" }
 cw-utils = "0.16.0"
 ibc-outgoing-msg = { path = "./packages/ibc-outgoing-msg", version = "*" }
-cw721-governed-proxy-multi-test = { path = "./packages/cw721-governed-proxy-multi-test", version = "*" }
+cw721-proxy-multi-test = { path = "./packages/cw721-proxy-multi-test", version = "*" }
 schemars = "0.8.11"
 proc-macro2 = "1.0"
 quote = "1.0"

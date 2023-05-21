@@ -1,6 +1,6 @@
 use cosmwasm_std::{coin, to_binary, Addr, Coin, Empty};
 use cw721_governed_proxy::error::ContractError as GovernedContractError;
-use cw721_governed_proxy_multi_test::Test as GovernedMultiTest;
+use cw721_proxy_multi_test::Test as GovernedMultiTest;
 use cw_multi_test::{AppResponse, Contract, ContractWrapper, Executor};
 
 use crate::{
@@ -21,9 +21,18 @@ pub struct Test {
 }
 
 impl Test {
-    pub fn new(cw721s: usize, transfer_fee: Option<Coin>) -> Self {
+    pub fn new(
+        cw721s: usize,
+        transfer_fee: Option<Coin>,
+        set_owner: bool,
+        whitelist: Option<Vec<u64>>,
+    ) -> Self {
         let mut governed_multi_test = GovernedMultiTest::new(cw721s, transfer_fee);
         let proxy_code_id = governed_multi_test.app.store_code(proxy_code());
+        let owner = match set_owner {
+            true => Some(governed_multi_test.minter.to_string()),
+            false => None,
+        };
         let proxy = governed_multi_test
             .app
             .instantiate_contract(
@@ -31,8 +40,9 @@ impl Test {
                 governed_multi_test.minter.clone(),
                 &InstantiateMsg {
                     origin: Some(governed_multi_test.mock_receiver.to_string()),
+                    owner,
                     transfer_fee: governed_multi_test.transfer_fee.clone(),
-                    whitelist: None,
+                    whitelist,
                 },
                 &[],
                 "governed proxy",
@@ -102,7 +112,7 @@ impl Test {
 #[test]
 fn add_to_whitelist_authorized() {
     let transfer_fee = Some(coin(100, "uark"));
-    let mut test = Test::new(1, transfer_fee);
+    let mut test = Test::new(1, transfer_fee, true, None);
     test.add_to_whitelist(test.governed_multi_test.minter.clone(), 1234)
         .unwrap();
 }
@@ -110,7 +120,7 @@ fn add_to_whitelist_authorized() {
 #[test]
 fn add_to_whitelist_unauthorized() {
     let transfer_fee = Some(coin(100, "uark"));
-    let mut test = Test::new(1, transfer_fee);
+    let mut test = Test::new(1, transfer_fee, false, None);
     let err: ContractError = test
         .add_to_whitelist(Addr::unchecked("unauthorized"), 1234)
         .unwrap_err()
@@ -127,7 +137,7 @@ fn add_to_whitelist_unauthorized() {
 #[test]
 fn remove_from_whitelist_authorized() {
     let transfer_fee = Some(coin(100, "uark"));
-    let mut test = Test::new(1, transfer_fee);
+    let mut test = Test::new(1, transfer_fee, true, None);
     test.remove_from_whitelist(test.governed_multi_test.minter.clone(), 1234)
         .unwrap();
 }
@@ -135,7 +145,7 @@ fn remove_from_whitelist_authorized() {
 #[test]
 fn remove_from_whitelist_unauthorized() {
     let transfer_fee = Some(coin(100, "uark"));
-    let mut test = Test::new(1, transfer_fee);
+    let mut test = Test::new(1, transfer_fee, false, None);
     let err: ContractError = test
         .remove_from_whitelist(Addr::unchecked("unauthorized"), 1234)
         .unwrap_err()
@@ -153,7 +163,7 @@ fn remove_from_whitelist_unauthorized() {
 
 #[test]
 fn bridge_nft_no_transfer_fee_whitelisted() {
-    let mut test = Test::new(1, None);
+    let mut test = Test::new(1, None, true, None);
     test.add_to_whitelist(
         test.governed_multi_test.minter.clone(),
         test.governed_multi_test.cw721_id,
@@ -203,7 +213,7 @@ fn bridge_nft_no_transfer_fee_whitelisted() {
 
 #[test]
 fn send_nft_no_transfer_fee_whitelisted() {
-    let mut test = Test::new(1, None);
+    let mut test = Test::new(1, None, true, None);
     test.add_to_whitelist(
         test.governed_multi_test.minter.clone(),
         test.governed_multi_test.cw721_id,
@@ -243,7 +253,7 @@ fn send_nft_no_transfer_fee_whitelisted() {
 
 #[test]
 fn bridge_nft_no_transfer_fee_not_whitelisted() {
-    let mut test = Test::new(1, None);
+    let mut test = Test::new(1, None, true, None);
     let token_id = test
         .governed_multi_test
         .mint(test.governed_multi_test.cw721s[0].clone())
@@ -279,7 +289,7 @@ fn bridge_nft_no_transfer_fee_not_whitelisted() {
 
 #[test]
 fn send_nft_no_transfer_fee_not_whitelisted() {
-    let mut test = Test::new(1, None);
+    let mut test = Test::new(1, None, true, None);
     let token_id = test
         .governed_multi_test
         .mint(test.governed_multi_test.cw721s[0].clone())

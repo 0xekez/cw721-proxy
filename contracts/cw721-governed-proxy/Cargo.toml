@@ -28,6 +28,6 @@ thiserror = { workspace = true }
 
 [dev-dependencies]
 cw-multi-test = { workspace = true }
-cw721-governed-proxy-multi-test = { workspace = true, features = ["library"] }
+cw721-proxy-multi-test = { workspace = true, features = ["library"] }
 cw721-proxy-tester = { workspace = true }
 anyhow = { workspace = true }

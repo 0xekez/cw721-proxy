@@ -11,7 +11,11 @@ impl<'a> Cw721GovernanceProxy<'a> {
         msg: InstantiateMsg,
     ) -> StdResult<Response> {
         self.save_transfer_fee(deps.storage, &msg.transfer_fee)?;
-        self.save_owner(deps.storage, &Some(info.sender.clone()))?;
+        let owner = match msg.owner {
+            Some(owner) => Some(deps.api.addr_validate(&owner)?),
+            None => None,
+        };
+        self.save_owner(deps.storage, &owner)?;
 
         let origin = msg
             .origin

@@ -8,6 +8,7 @@ use cosmwasm_std::{Binary, Coin};
 #[cw_serde]
 pub struct InstantiateMsg {
     pub origin: Option<String>,
+    pub owner: Option<String>,
     pub transfer_fee: Option<Coin>,
     pub rate_limit: Rate,
 }
