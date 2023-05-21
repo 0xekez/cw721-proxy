@@ -49,6 +49,7 @@ pub enum QueryMsg {
 pub enum MigrateMsg {
     WithUpdate {
         origin: Option<String>,
+        owner: Option<String>,
         transfer_fee: Option<Coin>,
     },
 }

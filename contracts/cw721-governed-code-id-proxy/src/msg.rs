@@ -65,8 +65,9 @@ pub enum QueryMsg {
 #[cw_serde]
 pub enum MigrateMsg {
     WithUpdate {
-        whitelist: Option<Vec<u64>>,
-        transfer_fee: Option<Coin>,
         origin: Option<String>,
+        owner: Option<String>,
+        transfer_fee: Option<Coin>,
+        whitelist: Option<Vec<u64>>,
     },
 }

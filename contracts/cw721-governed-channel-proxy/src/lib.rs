@@ -54,6 +54,7 @@ pub mod entry {
                 whitelist,
                 transfer_fee,
                 origin,
+                owner,
             } => {
                 if let Some(list) = whitelist.clone() {
                     list.iter()
@@ -69,6 +70,7 @@ pub mod entry {
                     env,
                     cw721_governed_proxy::msg::MigrateMsg::WithUpdate {
                         origin,
+                        owner,
                         transfer_fee,
                     },
                 )?;

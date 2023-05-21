@@ -51,9 +51,10 @@ pub mod entry {
         set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
         match msg {
             MigrateMsg::WithUpdate {
-                whitelist,
-                transfer_fee,
                 origin,
+                owner,
+                transfer_fee,
+                whitelist,
             } => {
                 if let Some(list) = whitelist.clone() {
                     list.iter()
@@ -69,6 +70,7 @@ pub mod entry {
                     env,
                     cw721_governed_proxy::msg::MigrateMsg::WithUpdate {
                         origin,
+                        owner,
                         transfer_fee,
                     },
                 )?;

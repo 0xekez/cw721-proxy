@@ -185,16 +185,22 @@ impl<'a> Cw721GovernanceProxy<'a> {
         match msg {
             MigrateMsg::WithUpdate {
                 origin,
+                owner,
                 transfer_fee,
             } => {
                 if let Some(origin) = origin.clone() {
                     let addr = deps.api.addr_validate(&origin)?;
                     self.save_origin(deps.storage, &addr)?;
                 }
+                if let Some(owner) = owner.clone() {
+                    let addr = deps.api.addr_validate(&owner)?;
+                    self.save_owner(deps.storage, &Some(addr))?;
+                }
                 self.save_transfer_fee(deps.storage, &transfer_fee)?;
                 Ok(Response::default()
                     .add_attribute("method", "migrate")
                     .add_attribute("origin", format!("{:?}", origin))
+                    .add_attribute("owner", format!("{:?}", owner))
                     .add_attribute("transfer_fee", format!("{:?}", transfer_fee)))
             }
         }
