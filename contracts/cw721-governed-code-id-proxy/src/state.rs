@@ -4,7 +4,7 @@ use cw721_whitelist::Whitelist;
 
 use crate::error::ContractError;
 
-pub const CONTRACT_NAME: &str = "crates.io:cw721-proxy-code-id";
+pub const CONTRACT_NAME: &str = "crates.io:cw721-governed_code-id-proxy";
 pub const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 pub struct Cw721GovernedCodeIdProxy<'a> {

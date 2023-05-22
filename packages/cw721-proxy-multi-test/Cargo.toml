@@ -5,10 +5,6 @@ authors = ["Mr T <mr-t@arkprotocol.io>"]
 edition = "2021"
 version = "0.0.1"
 
-[features]
-# use library feature to disable all instantiate/execute/query exports
-library = []
-
 [dependencies]
 cosmwasm-std = { workspace = true }
 cw-multi-test = { workspace = true }
@@ -17,4 +13,4 @@ cw721-proxy-tester = { workspace = true }
 ibc-outgoing-msg = { workspace = true }
 anyhow = { workspace = true }
 cw-utils = { workspace = true }
-cw721-governed-proxy = { workspace = true, features = ["library"] }
+cw721-governed-proxy = { workspace = true }

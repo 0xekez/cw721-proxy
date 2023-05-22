@@ -5,8 +5,6 @@ authors = ["Mr T <mr-t@arkprotocol.io>"]
 edition = "2021"
 version = "0.0.1"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 cosmwasm-std = { workspace = true }
 cosmwasm-schema = { workspace = true }

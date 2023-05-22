@@ -5,8 +5,6 @@ authors = ["Mr T <mr-t@arkprotocol.io>"]
 edition = "2021"
 version = "0.0.1"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [lib]
 crate-type = ["cdylib", "rlib"]
 
@@ -32,6 +30,6 @@ thiserror = { workspace = true }
 cw-multi-test = { workspace = true }
 cw721-base = { workspace = true }
 cw721-proxy-tester = { workspace = true }
-cw721-proxy-multi-test = { workspace = true, features = ["library"] }
+cw721-proxy-multi-test = { workspace = true }
 rand = { workspace = true }
 anyhow = { workspace = true }

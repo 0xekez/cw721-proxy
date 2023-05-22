@@ -31,6 +31,6 @@ thiserror = { workspace = true }
 cw-multi-test = { workspace = true }
 cw721-base = { workspace = true }
 cw721-proxy-tester = { workspace = true }
-cw721-proxy-multi-test = { workspace = true, features = ["library"] }
+cw721-proxy-multi-test = { workspace = true }
 rand = { workspace = true }
 anyhow = { workspace = true }

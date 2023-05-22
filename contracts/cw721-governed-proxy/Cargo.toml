@@ -17,17 +17,17 @@ library = []
 [dependencies]
 cosmwasm-std = { workspace = true }
 cosmwasm-schema = { workspace = true }
+cw-storage-plus = { workspace = true }
 cw2 = { workspace = true }
 cw721 = { workspace = true }
-cw721-base = { workspace = true }
+cw721-base = { workspace = true, features = ["library"] }
 cw721-proxy = { workspace = true }
-cw-storage-plus = { workspace = true }
 cw-utils = { workspace = true }
 ibc-outgoing-msg = { workspace = true }
 thiserror = { workspace = true }
 
 [dev-dependencies]
 cw-multi-test = { workspace = true }
-cw721-proxy-multi-test = { workspace = true, features = ["library"] }
 cw721-proxy-tester = { workspace = true }
+cw721-proxy-multi-test = { workspace = true }
 anyhow = { workspace = true }

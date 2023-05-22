@@ -7,6 +7,10 @@ use cw_utils::may_pay;
 
 use crate::error::ContractError;
 
+// Version info for migration
+pub const CONTRACT_NAME: &str = "crates.io:cw721-governed-proxy";
+pub const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
+
 /// A governed contract may have:
 /// - an optional owner,
 /// - an origin (ICS721) where msgs are forwarded to, and

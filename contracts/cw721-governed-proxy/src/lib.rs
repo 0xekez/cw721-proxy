@@ -1,31 +1,23 @@
 pub mod error;
-mod execute;
+pub mod execute;
 pub mod instantiate;
 pub mod msg;
-mod query;
+pub mod query;
 pub mod state;
 
-use cosmwasm_std::{Binary, DepsMut, Env, MessageInfo, Response, StdResult};
-
 #[cfg(test)]
-pub mod tests;
-
-// Version info for migration
-pub const CONTRACT_NAME: &str = "crates.io:cw-ics721-governance";
-pub const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
+mod tests;
 
 pub mod entry {
     use crate::{
         error::ContractError,
         msg::{ExecuteMsg, InstantiateMsg, MigrateMsg, QueryMsg},
-        state::Cw721GovernanceProxy,
+        state::{Cw721GovernanceProxy, CONTRACT_NAME, CONTRACT_VERSION},
     };
-
-    use super::*;
 
     #[cfg(not(feature = "library"))]
     use cosmwasm_std::entry_point;
-    use cosmwasm_std::Deps;
+    use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult};
     use cw2::set_contract_version;
 
     // This makes a conscious choice on the various generics used by the contract
@@ -38,8 +30,7 @@ pub mod entry {
     ) -> StdResult<Response> {
         set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
 
-        let governance = Cw721GovernanceProxy::new();
-        governance.instantiate(deps, env, info, msg)
+        Cw721GovernanceProxy::default().instantiate(deps, env, info, msg)
     }
 
     #[cfg_attr(not(feature = "library"), entry_point)]
@@ -49,18 +40,17 @@ pub mod entry {
         info: MessageInfo,
         msg: ExecuteMsg,
     ) -> Result<Response, ContractError> {
-        let governance = Cw721GovernanceProxy::new();
-        governance.execute(deps, env, info, msg)
+        Cw721GovernanceProxy::default().execute(deps, env, info, msg)
     }
 
     #[cfg_attr(not(feature = "library"), entry_point)]
     pub fn query(deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
-        let governance = Cw721GovernanceProxy::new();
-        governance.query(deps, env, msg)
+        Cw721GovernanceProxy::default().query(deps, env, msg)
     }
 
     #[cfg_attr(not(feature = "library"), entry_point)]
     pub fn migrate(deps: DepsMut, env: Env, msg: MigrateMsg) -> StdResult<Response> {
+        // Set contract to version to latest
         set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
         Cw721GovernanceProxy::default().migrate(deps, env, msg)
     }
