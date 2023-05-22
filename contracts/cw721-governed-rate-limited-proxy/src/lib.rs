@@ -54,9 +54,9 @@ pub mod entry {
                 origin,
                 owner,
                 transfer_fee,
-                rate,
+                rate_limit,
             } => {
-                if let Some(rate) = rate {
+                if let Some(rate) = rate_limit {
                     if rate.is_zero() {
                         return Err(ContractError::ZeroRate {});
                     } else {
@@ -74,7 +74,7 @@ pub mod entry {
                         transfer_fee,
                     },
                 )?;
-                Ok(res.add_attribute("rate", format!("{:?}", rate)))
+                Ok(res.add_attribute("rate_limit", format!("{:?}", rate_limit)))
             }
         }
     }

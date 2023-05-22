@@ -65,6 +65,6 @@ pub enum MigrateMsg {
         origin: Option<String>,
         owner: Option<String>,
         transfer_fee: Option<Coin>,
-        rate: Option<Rate>,
+        rate_limit: Option<Rate>,
     },
 }
