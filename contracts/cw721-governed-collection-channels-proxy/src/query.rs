@@ -1,9 +1,6 @@
 use cosmwasm_std::{to_binary, Binary, Deps, Env, Order, StdResult, Storage};
 
-use crate::{
-    msg::{QueryMsg, SenderToChannelsResponse},
-    state::Cw721GovernedCollectionChannelsProxy,
-};
+use crate::{msg::QueryMsg, state::Cw721GovernedCollectionChannelsProxy};
 
 impl Cw721GovernedCollectionChannelsProxy<'_> {
     pub fn query(&self, deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
@@ -25,20 +22,10 @@ impl Cw721GovernedCollectionChannelsProxy<'_> {
         }
     }
 
-    pub fn query_whitelist(
-        &self,
-        storage: &dyn Storage,
-    ) -> StdResult<Vec<SenderToChannelsResponse>> {
+    pub fn query_whitelist(&self, storage: &dyn Storage) -> StdResult<Vec<(String, Vec<String>)>> {
         self.whitelist
             .map
             .range(storage, None, None, Order::Ascending)
-            .map(|p| {
-                let (collection, channels) = p?;
-                Ok(SenderToChannelsResponse {
-                    collection,
-                    channels,
-                })
-            })
-            .collect::<StdResult<Vec<SenderToChannelsResponse>>>()
+            .collect()
     }
 }

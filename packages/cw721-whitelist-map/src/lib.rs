@@ -51,4 +51,9 @@ where
     pub fn remove(&self, storage: &mut dyn Storage, key: K) {
         self.map.remove(storage, key);
     }
+
+    pub fn clear(&self, storage: &mut dyn Storage) -> StdResult<()> {
+        self.map.clear(storage);
+        Ok(())
+    }
 }

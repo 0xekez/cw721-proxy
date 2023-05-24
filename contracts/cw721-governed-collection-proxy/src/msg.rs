@@ -40,6 +40,7 @@ pub enum ExecuteMsg {
     RemoveFromWhitelist {
         value: String,
     },
+    ClearWhitelist(),
 }
 
 #[cw_serde]

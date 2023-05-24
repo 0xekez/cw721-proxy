@@ -40,6 +40,7 @@ impl Cw721GovernedCollectionChannelsProxy<'_> {
             ExecuteMsg::RemoveFromWhitelist { collection } => {
                 self.execute_remove_from_whitelist(deps, env, info, collection)
             }
+            ExecuteMsg::ClearWhitelist() => self.execute_clear_whitelist(deps, env, info),
         }
     }
 
@@ -72,6 +73,17 @@ impl Cw721GovernedCollectionChannelsProxy<'_> {
         Ok(Response::default()
             .add_attribute("method", "execute_remove_from_whitelist")
             .add_attribute("key", collection))
+    }
+
+    pub fn execute_clear_whitelist(
+        &self,
+        deps: DepsMut,
+        _env: Env,
+        info: MessageInfo,
+    ) -> Result<Response, ContractError> {
+        self.governance.is_owner(deps.storage, info.sender)?;
+        self.whitelist.clear(deps.storage)?;
+        Ok(Response::default().add_attribute("method", "execute_clear_whitelist"))
     }
 
     pub fn execute_receive_nft(

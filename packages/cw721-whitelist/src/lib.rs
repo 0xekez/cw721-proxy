@@ -56,4 +56,9 @@ where
             false => Ok(()),
         }
     }
+
+    pub fn clear(&self, storage: &mut dyn Storage) -> StdResult<()> {
+        self.whitelist.save(storage, &Vec::new())?;
+        Ok(())
+    }
 }

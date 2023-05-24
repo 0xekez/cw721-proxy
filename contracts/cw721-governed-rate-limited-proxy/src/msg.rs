@@ -37,7 +37,7 @@ pub enum ExecuteMsg {
     },
     // ----
 
-    // -- whitelist specifics
+    // -- rate limit specifics
     RateLimit(Rate),
 }
 

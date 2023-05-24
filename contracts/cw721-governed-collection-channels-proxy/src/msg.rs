@@ -6,7 +6,7 @@ pub struct InstantiateMsg {
     pub origin: Option<String>,
     pub owner: Option<String>,
     pub transfer_fee: Option<Coin>,
-    pub whitelist: Option<Vec<SenderToChannelsResponse>>,
+    pub whitelist: Option<Vec<(String, Vec<String>)>>,
 }
 
 #[cw_serde]
@@ -41,6 +41,7 @@ pub enum ExecuteMsg {
     RemoveFromWhitelist {
         collection: String,
     },
+    ClearWhitelist(),
 }
 
 #[cw_serde]
@@ -57,7 +58,7 @@ pub enum QueryMsg {
     TransferFee {},
     // ----
     /// Gets a list of collection and channels authorized for ICS721 transfers.
-    #[returns(Vec<SenderToChannelsResponse>)]
+    #[returns(Vec<(String, Vec<String>)>)]
     Whitelist {},
 
     /// True in case CW721 contract and channel is authorized for ICS721 transfers.
@@ -71,14 +72,6 @@ pub enum MigrateMsg {
         origin: Option<String>,
         owner: Option<String>,
         transfer_fee: Option<Coin>,
-        whitelist: Option<Vec<SenderToChannelsResponse>>,
+        whitelist: Option<Vec<(String, Vec<String>)>>,
     },
-}
-
-#[cw_serde]
-pub struct SenderToChannelsResponse {
-    /// Authorized CW721 contract for ICS721 transfers.
-    pub collection: String,
-    /// Authorized channels for ICS721 transfers.
-    pub channels: Vec<String>,
 }

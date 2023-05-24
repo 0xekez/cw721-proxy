@@ -61,7 +61,7 @@ pub mod entry {
                         .map(|item| {
                             Cw721GovernedCollectionChannelsProxy::default()
                                 .whitelist
-                                .save(deps.storage, item.collection.clone(), &item.channels)
+                                .save(deps.storage, item.0.clone(), &item.1)
                         })
                         .collect::<StdResult<Vec<_>>>()?;
                 }

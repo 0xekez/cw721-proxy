@@ -27,9 +27,9 @@ impl Cw721GovernedCollectionChannelsProxy<'_> {
         if let Some(list) = msg.whitelist.clone() {
             list.iter()
                 .map(|item| {
-                    deps.api.addr_validate(item.collection.as_str())?;
+                    deps.api.addr_validate(item.0.as_str())?;
                     self.whitelist
-                        .save(deps.storage, item.collection.to_string(), &item.channels)
+                        .save(deps.storage, item.0.to_string(), &item.1)
                 })
                 .collect::<StdResult<Vec<_>>>()?;
         }
