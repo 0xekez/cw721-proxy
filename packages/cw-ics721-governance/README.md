@@ -122,3 +122,9 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     }
 }
 ```
+
+# Kudos
+
+This work has been adapted on the great work by Jake and Larry:
+- DAO DAO: https://github.com/DA0-DA0/dao-contracts/blob/74bd3881fdd86829e5e8b132b9952dd64f2d0737/packages/dao-macros/src/lib.rs#L9
+- CW++: https://github.com/larry0x/cw-plus-plus/tree/main/packages/ownable

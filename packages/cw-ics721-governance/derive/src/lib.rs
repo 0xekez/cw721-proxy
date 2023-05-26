@@ -77,6 +77,8 @@ fn merge_variants(metadata: TokenStream, left: TokenStream, right: TokenStream) 
 /// ```
 ///
 /// Note: `#[cw_ics721_governance_execute]` must be applied _before_ `#[cw_serde]`.
+/// Adapted from CW++:
+/// https://github.com/larry0x/cw-plus-plus/tree/main/packages/ownable
 #[proc_macro_attribute]
 pub fn cw_ics721_governance_execute(metadata: TokenStream, input: TokenStream) -> TokenStream {
     merge_variants(
@@ -161,6 +163,8 @@ pub fn cw_ics721_governance_execute(metadata: TokenStream, input: TokenStream) -
 /// ```
 ///
 /// Note: `#[cw_ics721_governance_query]` must be applied _before_ `#[cw_serde]`.
+/// Adapted from CW++:
+/// https://github.com/larry0x/cw-plus-plus/tree/main/packages/ownable
 #[proc_macro_attribute]
 pub fn cw_ics721_governance_query(metadata: TokenStream, input: TokenStream) -> TokenStream {
     merge_variants(
