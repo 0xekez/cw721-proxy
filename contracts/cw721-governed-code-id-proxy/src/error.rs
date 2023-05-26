@@ -1,5 +1,5 @@
 use cosmwasm_std::StdError;
-use cw721_governed_proxy::error::ContractError as GovernanceContractError;
+use cw_ics721_governance::GovernanceError;
 use thiserror::Error;
 
 #[derive(Error, Debug, PartialEq)]
@@ -8,7 +8,7 @@ pub enum ContractError {
     Std(#[from] StdError),
 
     #[error(transparent)]
-    GovernanceError(#[from] GovernanceContractError),
+    Governance(#[from] GovernanceError),
 
     #[error("{requestee} not whitelisted!")]
     NotWhitelisted { requestee: u64 },

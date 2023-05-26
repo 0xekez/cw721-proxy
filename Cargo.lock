@@ -196,6 +196,33 @@ dependencies = [
 ]
 
 [[package]]
+name = "cw-ics721-governance"
+version = "0.0.1"
+dependencies = [
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw-ics721-governance-derive",
+ "cw-storage-plus 0.16.0",
+ "cw-utils 0.16.0",
+ "cw721",
+ "cw721-base",
+ "cw721-proxy",
+ "schemars",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
+name = "cw-ics721-governance-derive"
+version = "0.0.1"
+dependencies = [
+ "cosmwasm-std",
+ "proc-macro2",
+ "quote",
+ "syn 1.0.105",
+]
+
+[[package]]
 name = "cw-multi-test"
 version = "0.16.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -341,6 +368,7 @@ dependencies = [
  "anyhow",
  "cosmwasm-schema",
  "cosmwasm-std",
+ "cw-ics721-governance",
  "cw-multi-test",
  "cw-storage-plus 0.16.0",
  "cw2 0.16.0",
@@ -364,6 +392,7 @@ dependencies = [
  "anyhow",
  "cosmwasm-schema",
  "cosmwasm-std",
+ "cw-ics721-governance",
  "cw-multi-test",
  "cw-storage-plus 0.16.0",
  "cw2 0.16.0",
@@ -387,6 +416,7 @@ dependencies = [
  "anyhow",
  "cosmwasm-schema",
  "cosmwasm-std",
+ "cw-ics721-governance",
  "cw-multi-test",
  "cw-storage-plus 0.16.0",
  "cw2 0.16.0",
@@ -409,6 +439,7 @@ dependencies = [
  "anyhow",
  "cosmwasm-schema",
  "cosmwasm-std",
+ "cw-ics721-governance",
  "cw-multi-test",
  "cw-storage-plus 0.16.0",
  "cw-utils 0.16.0",
@@ -429,6 +460,7 @@ dependencies = [
  "anyhow",
  "cosmwasm-schema",
  "cosmwasm-std",
+ "cw-ics721-governance",
  "cw-multi-test",
  "cw-rate-limiter",
  "cw-storage-plus 0.16.0",
@@ -452,6 +484,7 @@ dependencies = [
  "anyhow",
  "cosmwasm-schema",
  "cosmwasm-std",
+ "cw-ics721-governance",
  "cw-multi-test",
  "cw-storage-plus 0.16.0",
  "cw2 0.16.0",
@@ -463,6 +496,7 @@ dependencies = [
  "cw721-proxy-multi-test",
  "cw721-proxy-tester",
  "cw721-whitelist",
+ "ibc-outgoing-msg",
  "rand",
  "thiserror",
 ]
@@ -494,11 +528,13 @@ name = "cw721-proxy-multi-test"
 version = "0.0.1"
 dependencies = [
  "anyhow",
+ "cosmwasm-schema",
  "cosmwasm-std",
+ "cw-ics721-governance",
  "cw-multi-test",
  "cw-utils 0.16.0",
+ "cw721",
  "cw721-base",
- "cw721-governed-proxy",
  "cw721-proxy-tester",
  "ibc-outgoing-msg",
 ]

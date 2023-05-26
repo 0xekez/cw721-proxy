@@ -1,0 +1,26 @@
+[package]
+name        = "cw-ics721-governance"
+version     = "0.0.1"
+description = "TODO"
+license     = { workspace = true }
+authors     = { workspace = true }
+edition     = { workspace = true }
+homepage    = { workspace = true }
+repository  = { workspace = true }
+keywords    = { workspace = true }
+
+[lib]
+doctest = false # disable doc tests
+
+[dependencies]
+cosmwasm-schema      = { workspace = true }
+cosmwasm-std         = { workspace = true }
+cw-ics721-governance-derive = { workspace = true }
+cw-storage-plus      = { workspace = true }
+cw-utils             = { workspace = true }
+cw721                = { workspace = true }
+cw721-base           = { workspace = true, features = ["library"] }
+cw721-proxy = { workspace = true }
+schemars = { workspace = true }
+serde = { workspace = true }
+thiserror            = { workspace = true }

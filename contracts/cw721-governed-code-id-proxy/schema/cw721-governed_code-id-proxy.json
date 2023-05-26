@@ -13,6 +13,12 @@
           "null"
         ]
       },
+      "owner": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
       "transfer_fee": {
         "anyOf": [
           {
@@ -65,118 +71,6 @@
       {
         "type": "object",
         "required": [
-          "owner"
-        ],
-        "properties": {
-          "owner": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      {
-        "type": "object",
-        "required": [
-          "origin"
-        ],
-        "properties": {
-          "origin": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      {
-        "description": "Transfer fee for bridging nft",
-        "type": "object",
-        "required": [
-          "transfer_fee"
-        ],
-        "properties": {
-          "transfer_fee": {
-            "anyOf": [
-              {
-                "$ref": "#/definitions/Coin"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          }
-        },
-        "additionalProperties": false
-      },
-      {
-        "description": "Send funds from proxy to address",
-        "type": "object",
-        "required": [
-          "send_funds"
-        ],
-        "properties": {
-          "send_funds": {
-            "type": "object",
-            "required": [
-              "amount",
-              "to_address"
-            ],
-            "properties": {
-              "amount": {
-                "$ref": "#/definitions/Coin"
-              },
-              "to_address": {
-                "type": "string"
-              }
-            },
-            "additionalProperties": false
-          }
-        },
-        "additionalProperties": false
-      },
-      {
-        "type": "object",
-        "required": [
-          "receive_nft"
-        ],
-        "properties": {
-          "receive_nft": {
-            "$ref": "#/definitions/Cw721ReceiveMsg"
-          }
-        },
-        "additionalProperties": false
-      },
-      {
-        "description": "analogous to SendNft from cw721_base",
-        "type": "object",
-        "required": [
-          "bridge_nft"
-        ],
-        "properties": {
-          "bridge_nft": {
-            "type": "object",
-            "required": [
-              "collection",
-              "msg",
-              "token_id"
-            ],
-            "properties": {
-              "collection": {
-                "type": "string"
-              },
-              "msg": {
-                "$ref": "#/definitions/Binary"
-              },
-              "token_id": {
-                "type": "string"
-              }
-            },
-            "additionalProperties": false
-          }
-        },
-        "additionalProperties": false
-      },
-      {
-        "type": "object",
-        "required": [
           "add_to_whitelist"
         ],
         "properties": {
@@ -219,9 +113,157 @@
           }
         },
         "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "required": [
+          "clear_whitelist"
+        ],
+        "properties": {
+          "clear_whitelist": {
+            "type": "array",
+            "items": [],
+            "maxItems": 0,
+            "minItems": 0
+          }
+        },
+        "additionalProperties": false
+      },
+      {
+        "description": "Actions that can be taken to alter the proxy contract's governance like in `execute`'s entry point: ```rust use cosmwasm_std::{from_binary, Binary, DepsMut, Env, MessageInfo, Response, Storage}; use cosmwasm_schema::cw_serde; use cosmwasm_std::entry_point;\n\n#[cw_serde] pub enum ExecuteMsg { Governance(cw_ics721_governance::Action), ReceiveNft(cw721::Cw721ReceiveMsg) }\n\n#[cfg_attr(not(feature = \"library\"), entry_point)] pub fn execute( deps: DepsMut, env: Env, info: MessageInfo, msg: ExecuteMsg, ) -> Result<Response, cw_ics721_governance::GovernanceError> { match msg { ExecuteMsg::Governance(action) => { Ok(cw_ics721_governance::execute(deps, env, &info, action)?) } ExecuteMsg::ReceiveNft(msg) => { Ok(cw_ics721_governance::execute_receive_nft(deps, info, msg)?) } } } ```",
+        "type": "object",
+        "required": [
+          "governance"
+        ],
+        "properties": {
+          "governance": {
+            "$ref": "#/definitions/Action"
+          }
+        },
+        "additionalProperties": false
+      },
+      {
+        "description": "Cw721ReceiveMsg to be forwared to ICS721 (origin). NOTE: this is NOT part of governance, since it is send by cw721 contract diretly to proxy",
+        "type": "object",
+        "required": [
+          "receive_nft"
+        ],
+        "properties": {
+          "receive_nft": {
+            "$ref": "#/definitions/Cw721ReceiveMsg"
+          }
+        },
+        "additionalProperties": false
       }
     ],
     "definitions": {
+      "Action": {
+        "description": "Actions that can be taken to alter the proxy contract's governance",
+        "oneOf": [
+          {
+            "description": "Changing owner of proxy. Once set, it can't be set to None - except via migration.",
+            "type": "object",
+            "required": [
+              "owner"
+            ],
+            "properties": {
+              "owner": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "description": "ICS721 contract where Cw721ReceiveMsg is forwarded to.",
+            "type": "object",
+            "required": [
+              "origin"
+            ],
+            "properties": {
+              "origin": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "description": "Optional transfer fee, if provided it will be checked whether funds have been send on `receive_nft` and `bridge_nft` is called. This means pratically only `bridge_nft` is eligible to call ics721, since `send_nft` is called by collection - and in case of base cw721 it doesn't send funds!",
+            "type": "object",
+            "required": [
+              "transfer_fee"
+            ],
+            "properties": {
+              "transfer_fee": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/Coin"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "description": "Send funds from proxy to specified address.",
+            "type": "object",
+            "required": [
+              "send_funds"
+            ],
+            "properties": {
+              "send_funds": {
+                "type": "object",
+                "required": [
+                  "amount",
+                  "to_address"
+                ],
+                "properties": {
+                  "amount": {
+                    "$ref": "#/definitions/Coin"
+                  },
+                  "to_address": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "description": "Analogous to `cw721::Cw721ExecuteMsg::SendNft`, where NFT is transferred to ICS721 (escrow) and forwards `Cw721ReceiveMsg` to ICS721.",
+            "type": "object",
+            "required": [
+              "bridge_nft"
+            ],
+            "properties": {
+              "bridge_nft": {
+                "type": "object",
+                "required": [
+                  "collection",
+                  "msg",
+                  "token_id"
+                ],
+                "properties": {
+                  "collection": {
+                    "type": "string"
+                  },
+                  "msg": {
+                    "$ref": "#/definitions/Binary"
+                  },
+                  "token_id": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          }
+        ]
+      },
       "Binary": {
         "description": "Binary is a wrapper around Vec<u8> to add base64 de/serialization with serde. It also adds some helper methods to help encode inline.\n\nThis is only needed as serde-json-{core,wasm} has a horrible encoding for Vec<u8>. See also <https://github.com/CosmWasm/cosmwasm/blob/main/docs/MESSAGE_TYPES.md>.",
         "type": "string"
@@ -275,45 +317,6 @@
       {
         "type": "object",
         "required": [
-          "owner"
-        ],
-        "properties": {
-          "owner": {
-            "type": "object",
-            "additionalProperties": false
-          }
-        },
-        "additionalProperties": false
-      },
-      {
-        "type": "object",
-        "required": [
-          "origin"
-        ],
-        "properties": {
-          "origin": {
-            "type": "object",
-            "additionalProperties": false
-          }
-        },
-        "additionalProperties": false
-      },
-      {
-        "type": "object",
-        "required": [
-          "transfer_fee"
-        ],
-        "properties": {
-          "transfer_fee": {
-            "type": "object",
-            "additionalProperties": false
-          }
-        },
-        "additionalProperties": false
-      },
-      {
-        "type": "object",
-        "required": [
           "whitelist"
         ],
         "properties": {
@@ -346,36 +349,66 @@
           }
         },
         "additionalProperties": false
+      },
+      {
+        "description": "Query the contract's governance information",
+        "type": "object",
+        "required": [
+          "governance"
+        ],
+        "properties": {
+          "governance": {
+            "type": "array",
+            "items": [],
+            "maxItems": 0,
+            "minItems": 0
+          }
+        },
+        "additionalProperties": false
       }
     ]
   },
   "migrate": null,
   "sudo": null,
   "responses": {
-    "origin": {
+    "governance": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Addr",
-      "description": "A human readable address.\n\nIn Cosmos, this is typically bech32 encoded. But for multi-chain smart contracts no assumptions should be made other than being UTF-8 encoded and of reasonable length.\n\nThis type represents a validated address. It can be created in the following ways 1. Use `Addr::unchecked(input)` 2. Use `let checked: Addr = deps.api.addr_validate(input)?` 3. Use `let checked: Addr = deps.api.addr_humanize(canonical_addr)?` 4. Deserialize from JSON. This must only be done from JSON that was validated before such as a contract's state. `Addr` must not be used in messages sent by the user because this would result in unvalidated instances.\n\nThis type is immutable. If you really need to mutate it (Really? Are you sure?), create a mutable copy using `let mut mutable = Addr::to_string()` and operate on that `String` instance.",
-      "type": "string"
-    },
-    "owner": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Addr",
-      "description": "A human readable address.\n\nIn Cosmos, this is typically bech32 encoded. But for multi-chain smart contracts no assumptions should be made other than being UTF-8 encoded and of reasonable length.\n\nThis type represents a validated address. It can be created in the following ways 1. Use `Addr::unchecked(input)` 2. Use `let checked: Addr = deps.api.addr_validate(input)?` 3. Use `let checked: Addr = deps.api.addr_humanize(canonical_addr)?` 4. Deserialize from JSON. This must only be done from JSON that was validated before such as a contract's state. `Addr` must not be used in messages sent by the user because this would result in unvalidated instances.\n\nThis type is immutable. If you really need to mutate it (Really? Are you sure?), create a mutable copy using `let mut mutable = Addr::to_string()` and operate on that `String` instance.",
-      "type": "string"
-    },
-    "transfer_fee": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Nullable_Coin",
-      "anyOf": [
-        {
-          "$ref": "#/definitions/Coin"
-        },
-        {
-          "type": "null"
-        }
+      "title": "Governance",
+      "description": "A governed contract may have: - an optional owner, - an origin (ICS721) where msgs are forwarded to, and - an optional transfer fee.\n\nOwner: - used in assert_owner(). For example execute_transfer_fee() allows only owner to change fees.\n\nOrigin: - ...\n\nTransfer Fee: - ...",
+      "type": "object",
+      "required": [
+        "origin"
       ],
+      "properties": {
+        "origin": {
+          "$ref": "#/definitions/Addr"
+        },
+        "owner": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Addr"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "transfer_fee": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Coin"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
       "definitions": {
+        "Addr": {
+          "description": "A human readable address.\n\nIn Cosmos, this is typically bech32 encoded. But for multi-chain smart contracts no assumptions should be made other than being UTF-8 encoded and of reasonable length.\n\nThis type represents a validated address. It can be created in the following ways 1. Use `Addr::unchecked(input)` 2. Use `let checked: Addr = deps.api.addr_validate(input)?` 3. Use `let checked: Addr = deps.api.addr_humanize(canonical_addr)?` 4. Deserialize from JSON. This must only be done from JSON that was validated before such as a contract's state. `Addr` must not be used in messages sent by the user because this would result in unvalidated instances.\n\nThis type is immutable. If you really need to mutate it (Really? Are you sure?), create a mutable copy using `let mut mutable = Addr::to_string()` and operate on that `String` instance.",
+          "type": "string"
+        },
         "Coin": {
           "type": "object",
           "required": [

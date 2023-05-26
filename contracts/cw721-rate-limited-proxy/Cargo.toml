@@ -4,6 +4,7 @@ license = "BSD-3"
 authors = ["ekez <ekez@withoutdoing.com>"]
 edition = "2021"
 version = "0.0.1"
+repository  = "https://github.com/0xekez/cw721-proxy"
 
 [lib]
 crate-type = ["cdylib", "rlib"]

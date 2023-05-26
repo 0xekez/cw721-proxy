@@ -1,5 +1,6 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use cosmwasm_std::{Addr, Binary, Coin};
+use cosmwasm_std::Coin;
+use cw_ics721_governance::{cw_ics721_governance_execute, cw_ics721_governance_query};
 
 #[cw_serde]
 pub struct InstantiateMsg {
@@ -8,42 +9,14 @@ pub struct InstantiateMsg {
     pub transfer_fee: Option<Coin>,
 }
 
+#[cw_ics721_governance_execute]
 #[cw_serde]
-pub enum ExecuteMsg {
-    Owner(String),
-    Origin(String),
+pub enum ExecuteMsg {}
 
-    /// Transfer fee for bridging nft
-    TransferFee(Option<Coin>),
-
-    /// Send funds from proxy to address
-    SendFunds {
-        to_address: String,
-        amount: Coin,
-    },
-
-    ReceiveNft(cw721::Cw721ReceiveMsg),
-    /// analogous to SendNft from cw721_base
-    BridgeNft {
-        collection: String,
-        token_id: String,
-        msg: Binary,
-    },
-}
-
+#[cw_ics721_governance_query]
 #[cw_serde]
 #[derive(QueryResponses)]
-pub enum QueryMsg {
-    #[returns(Addr)]
-    Owner {},
-
-    /// Gets ICS721 contract.
-    #[returns(Addr)]
-    Origin {},
-
-    #[returns(Option<Coin>)]
-    TransferFee {},
-}
+pub enum QueryMsg {}
 
 #[cw_serde]
 pub enum MigrateMsg {

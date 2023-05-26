@@ -1,5 +1,5 @@
 use cosmwasm_schema::serde::{de::DeserializeOwned, Serialize};
-use cosmwasm_std::{DepsMut, StdResult, Storage};
+use cosmwasm_std::{StdResult, Storage};
 use cw_storage_plus::Item;
 
 pub struct Whitelist<'a, T> {
@@ -16,9 +16,9 @@ where
         }
     }
 
-    pub fn init(&self, deps: DepsMut, whitelist: Option<Vec<T>>) -> StdResult<()> {
-        let whitelist = whitelist.map_or(vec![], |wl| wl).into_iter().collect();
-        self.whitelist.save(deps.storage, &whitelist)
+    pub fn init(&self, storage: &mut dyn Storage, whitelist: &Option<Vec<T>>) -> StdResult<()> {
+        let whitelist = whitelist.clone().map_or(vec![], |wl| wl);
+        self.whitelist.save(storage, &whitelist)
     }
 
     pub fn query_whitelist(&self, storage: &dyn Storage) -> StdResult<Vec<T>> {

@@ -1,12 +1,12 @@
-use cosmwasm_std::{coin, to_binary, Addr, Coin, Empty};
-use cw721_governed_proxy::error::ContractError as GovernedContractError;
+use cosmwasm_std::{coin, to_binary, Addr, Coin, Empty, StdResult};
 use cw721_proxy_multi_test::Test as GovernedMultiTest;
+use cw_ics721_governance::{Action, GovernanceError};
 use cw_multi_test::{AppResponse, Contract, ContractWrapper, Executor};
 
 use crate::{
     entry,
     error::ContractError,
-    msg::{ExecuteMsg, InstantiateMsg},
+    msg::{ExecuteMsg, InstantiateMsg, QueryMsg},
 };
 
 fn proxy_code() -> Box<dyn Contract<Empty>> {
@@ -84,6 +84,24 @@ impl Test {
         Ok(res)
     }
 
+    pub fn clear_whitelist(&mut self, owner: Addr) -> Result<AppResponse, anyhow::Error> {
+        let res = self.governed_multi_test.app.execute_contract(
+            owner.clone(),
+            self.proxy.clone(),
+            &ExecuteMsg::ClearWhitelist(),
+            &[],
+        )?;
+        Ok(res)
+    }
+
+    pub fn query_whitelist(&self) -> StdResult<Vec<u64>> {
+        // in case proxy passed message to origin
+        self.governed_multi_test
+            .app
+            .wrap()
+            .query_wasm_smart(&self.proxy, &QueryMsg::Whitelist {})
+    }
+
     pub fn bridge_nft(
         &mut self,
         sender: Addr,
@@ -97,11 +115,11 @@ impl Test {
         let res = self.governed_multi_test.app.execute_contract(
             sender,
             proxy,
-            &ExecuteMsg::BridgeNft {
+            &ExecuteMsg::Governance(Action::BridgeNft {
                 collection: collection.to_string(),
                 token_id,
                 msg: to_binary(&self.governed_multi_test.ibc_outgoing_msg(channel_id))?,
-            },
+            }),
             &funds,
         )?;
 
@@ -110,7 +128,7 @@ impl Test {
 }
 
 #[test]
-fn add_to_whitelist_authorized() {
+fn add_to_whitelist_owner() {
     let transfer_fee = Some(coin(100, "uark"));
     let mut test = Test::new(1, transfer_fee, true, None);
     test.add_to_whitelist(test.governed_multi_test.minter.clone(), 1234)
@@ -118,7 +136,7 @@ fn add_to_whitelist_authorized() {
 }
 
 #[test]
-fn add_to_whitelist_unauthorized() {
+fn add_to_whitelist_no_owner() {
     let transfer_fee = Some(coin(100, "uark"));
     let mut test = Test::new(1, transfer_fee, false, None);
     let err: ContractError = test
@@ -126,16 +144,26 @@ fn add_to_whitelist_unauthorized() {
         .unwrap_err()
         .downcast()
         .unwrap();
+    assert_eq!(err, ContractError::Governance(GovernanceError::NoOwner))
+}
+
+#[test]
+fn add_to_whitelist_not_owner() {
+    let transfer_fee = Some(coin(100, "uark"));
+    let mut test = Test::new(1, transfer_fee, true, None);
+    let err: ContractError = test
+        .add_to_whitelist(Addr::unchecked("unauthorized"), 1234)
+        .unwrap_err()
+        .downcast()
+        .unwrap();
     assert_eq!(
         err,
-        ContractError::GovernanceError(GovernedContractError::Unauthorized {
-            addr: "unauthorized".to_string()
-        })
+        ContractError::Governance(GovernanceError::NotOwner("unauthorized".to_string()))
     )
 }
 
 #[test]
-fn remove_from_whitelist_authorized() {
+fn remove_from_whitelist_owner() {
     let transfer_fee = Some(coin(100, "uark"));
     let mut test = Test::new(1, transfer_fee, true, None);
     test.remove_from_whitelist(test.governed_multi_test.minter.clone(), 1234)
@@ -143,7 +171,7 @@ fn remove_from_whitelist_authorized() {
 }
 
 #[test]
-fn remove_from_whitelist_unauthorized() {
+fn remove_from_whitelist_no_owner() {
     let transfer_fee = Some(coin(100, "uark"));
     let mut test = Test::new(1, transfer_fee, false, None);
     let err: ContractError = test
@@ -151,11 +179,60 @@ fn remove_from_whitelist_unauthorized() {
         .unwrap_err()
         .downcast()
         .unwrap();
+    assert_eq!(err, ContractError::Governance(GovernanceError::NoOwner))
+}
+
+#[test]
+fn remove_from_whitelist_not_owner() {
+    let transfer_fee = Some(coin(100, "uark"));
+    let mut test = Test::new(1, transfer_fee, true, None);
+    let err: ContractError = test
+        .remove_from_whitelist(Addr::unchecked("unauthorized"), 1234)
+        .unwrap_err()
+        .downcast()
+        .unwrap();
     assert_eq!(
         err,
-        ContractError::GovernanceError(GovernedContractError::Unauthorized {
-            addr: "unauthorized".to_string()
-        })
+        ContractError::Governance(GovernanceError::NotOwner("unauthorized".to_string()))
+    )
+}
+
+#[test]
+fn clear_whitelist_owner() {
+    let transfer_fee = Some(coin(100, "uark"));
+    let whitelist = vec![1234];
+    let mut test = Test::new(1, transfer_fee, true, Some(whitelist.clone()));
+    assert_eq!(test.query_whitelist().unwrap(), whitelist,);
+
+    test.clear_whitelist(test.governed_multi_test.minter.clone())
+        .unwrap();
+    assert_eq!(test.query_whitelist().unwrap(), Vec::<u64>::new(),)
+}
+
+#[test]
+fn clear_whitelist_no_owner() {
+    let transfer_fee = Some(coin(100, "uark"));
+    let mut test = Test::new(1, transfer_fee, false, None);
+    let err: ContractError = test
+        .clear_whitelist(Addr::unchecked("unauthorized"))
+        .unwrap_err()
+        .downcast()
+        .unwrap();
+    assert_eq!(err, ContractError::Governance(GovernanceError::NoOwner))
+}
+
+#[test]
+fn clear_whitelist_not_owner() {
+    let transfer_fee = Some(coin(100, "uark"));
+    let mut test = Test::new(1, transfer_fee, true, None);
+    let err: ContractError = test
+        .clear_whitelist(Addr::unchecked("unauthorized"))
+        .unwrap_err()
+        .downcast()
+        .unwrap();
+    assert_eq!(
+        err,
+        ContractError::Governance(GovernanceError::NotOwner("unauthorized".to_string()))
     )
 }
 

@@ -43,7 +43,7 @@ A governed proxy stores this:
 
 - `origin`: required ics721 contract for handling inter-chain transfers.
 - `owner`: optional, if given only owner is authorized changing `origin`, `owner`, `transfer_fee` and execute `send_funds`.
-- `transfer_fee`: optional, if provided it will be checked whether funds have been send when `receive_nft` and `bridge_nft` is called. This means pratically only `bridge_nft` is eligible to call ics721, since `send_nft` is called by collection - and in case of base cw721 it doesn't send funds!
+- `transfer_fee`: optional, if provided it will be checked whether funds have been send on `receive_nft` and `bridge_nft` is called. This means pratically only `bridge_nft` is eligible to call ics721, since `send_nft` is called by collection - and in case of base cw721 it doesn't send funds!
 
 IMPORTANT: in case `owner` is not set, above stores (`origin`, `owner` and `transfer_fee`) are immutable. Also `send_funds` is disabled then. The only way of changing these is via migration!
 

@@ -1,16 +1,22 @@
 [package]
-name = "cw721-proxy-multi-test"
-license = "BSD-3"
-authors = ["Mr T <mr-t@arkprotocol.io>"]
-edition = "2021"
-version = "0.0.1"
+name        = "cw721-proxy-multi-test"
+version     = "0.0.1"
+description = "TODO"
+license     = { workspace = true }
+authors     = { workspace = true }
+edition     = { workspace = true }
+homepage    = { workspace = true }
+repository  = { workspace = true }
+keywords    = { workspace = true }
 
 [dependencies]
 cosmwasm-std = { workspace = true }
+cosmwasm-schema = { workspace = true }
 cw-multi-test = { workspace = true }
+cw721 = { workspace = true }
 cw721-base = { workspace = true }
 cw721-proxy-tester = { workspace = true }
 ibc-outgoing-msg = { workspace = true }
 anyhow = { workspace = true }
 cw-utils = { workspace = true }
-cw721-governed-proxy = { workspace = true }
+cw-ics721-governance = { workspace = true }

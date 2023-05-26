@@ -1,9 +1,13 @@
 [package]
-name = "cw721-whitelist-map"
-license = "BSD-3"
-authors = ["Mr T <mr-t@arkprotocol.io>"]
-edition = "2021"
-version = "0.0.1"
+name        = "cw721-whitelist-map"
+version     = "0.0.1"
+description = "TODO"
+license     = { workspace = true }
+authors     = { workspace = true }
+edition     = { workspace = true }
+homepage    = { workspace = true }
+repository  = { workspace = true }
+keywords    = { workspace = true }
 
 [dependencies]
 cosmwasm-std = { workspace = true }

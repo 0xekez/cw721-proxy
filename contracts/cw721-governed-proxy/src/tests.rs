@@ -1,12 +1,8 @@
 use cosmwasm_std::{coin, to_binary, Addr, Coin, Empty};
 use cw721_proxy_multi_test::Test as GovernedMultiTest;
-use cw_multi_test::{App, Contract, ContractWrapper, Executor};
+use cw_multi_test::{Contract, ContractWrapper, Executor};
 
-use crate::{
-    entry,
-    error::ContractError,
-    msg::{InstantiateMsg, QueryMsg},
-};
+use crate::{entry, error::ContractError, msg::InstantiateMsg};
 
 fn proxy_code() -> Box<dyn Contract<Empty>> {
     let contract = ContractWrapper::new(entry::execute, entry::instantiate, entry::query);
@@ -48,192 +44,6 @@ impl Test {
             proxy,
         }
     }
-}
-
-#[test]
-fn test_origin_specified() {
-    let mut app = App::default();
-    let proxy_code_id = app.store_code(proxy_code());
-
-    let proxy = app
-        .instantiate_contract(
-            proxy_code_id,
-            Addr::unchecked("foo"),
-            &InstantiateMsg {
-                origin: Some("ark_protocol".to_string()),
-                transfer_fee: None,
-                owner: None,
-            },
-            &[],
-            "governed proxy",
-            None,
-        )
-        .unwrap();
-
-    let origin: Addr = app
-        .wrap()
-        .query_wasm_smart(&proxy, &QueryMsg::Origin {})
-        .unwrap();
-    assert_eq!(origin, Addr::unchecked("ark_protocol"));
-}
-
-#[test]
-fn test_sender_is_origin() {
-    let mut app = App::default();
-    let cw721_proxy_code_id = app.store_code(proxy_code());
-
-    // Check that origin is set to instantiator if origin is None
-    // during instantiation.
-    let cw721_proxy = app
-        .instantiate_contract(
-            cw721_proxy_code_id,
-            Addr::unchecked("foo"),
-            &InstantiateMsg {
-                origin: None,
-                transfer_fee: None,
-                owner: None,
-            },
-            &[],
-            "only whitelisted addresses are alllowed",
-            None,
-        )
-        .unwrap();
-
-    let origin: Addr = app
-        .wrap()
-        .query_wasm_smart(&cw721_proxy, &QueryMsg::Origin {})
-        .unwrap();
-    assert_eq!(origin, Addr::unchecked("foo"));
-}
-
-#[test]
-fn execute_owner_authorized() {
-    let mut test = Test::new(1, None, true);
-    test.governed_multi_test
-        .execute_owner(
-            test.governed_multi_test.minter.clone(),
-            test.proxy,
-            Addr::unchecked("ark"),
-        )
-        .unwrap();
-}
-
-#[test]
-fn execute_owner_unauthorized() {
-    let mut test = Test::new(1, None, false);
-    let err: ContractError = test
-        .governed_multi_test
-        .execute_owner(
-            test.governed_multi_test.other.clone(),
-            test.proxy,
-            Addr::unchecked("ark"),
-        )
-        .unwrap_err()
-        .downcast()
-        .unwrap();
-    assert_eq!(
-        err,
-        ContractError::Unauthorized {
-            addr: "other".to_string()
-        }
-    )
-}
-
-#[test]
-fn execute_origin_authorized() {
-    let mut test = Test::new(1, None, true);
-    test.governed_multi_test
-        .execute_origin(
-            test.governed_multi_test.minter.clone(),
-            test.proxy,
-            Addr::unchecked("ark"),
-        )
-        .unwrap();
-}
-
-#[test]
-fn execute_origin_unauthorized() {
-    let mut test = Test::new(1, None, false);
-    let err: ContractError = test
-        .governed_multi_test
-        .execute_origin(
-            test.governed_multi_test.other.clone(),
-            test.proxy,
-            Addr::unchecked("ark"),
-        )
-        .unwrap_err()
-        .downcast()
-        .unwrap();
-    assert_eq!(
-        err,
-        ContractError::Unauthorized {
-            addr: "other".to_string()
-        }
-    )
-}
-
-#[test]
-fn send_funds_authorized() {
-    let mut test = Test::new(1, None, true);
-    test.governed_multi_test
-        .send_funds(
-            test.governed_multi_test.minter.clone(),
-            test.proxy,
-            test.governed_multi_test.minter.to_string(),
-            coin(100, "uark"),
-        )
-        .unwrap();
-}
-
-#[test]
-fn send_funds_unauthorized() {
-    let mut test = Test::new(1, None, false);
-    let err: ContractError = test
-        .governed_multi_test
-        .send_funds(
-            test.governed_multi_test.other.clone(),
-            test.proxy,
-            test.governed_multi_test.minter.to_string(),
-            coin(10, "uark"),
-        )
-        .unwrap_err()
-        .downcast()
-        .unwrap();
-    assert_eq!(
-        err,
-        ContractError::Unauthorized {
-            addr: "other".to_string()
-        }
-    )
-}
-
-#[test]
-fn execute_transfer_fee_authorized() {
-    let mut test = Test::new(1, None, true);
-    test.governed_multi_test
-        .execute_transfer_fee(
-            test.governed_multi_test.minter.clone(),
-            test.proxy,
-            Some(coin(100, "uark")),
-        )
-        .unwrap();
-}
-
-#[test]
-fn execute_transfer_fee_unauthorized() {
-    let mut test = Test::new(1, None, false);
-    let err: ContractError = test
-        .governed_multi_test
-        .execute_transfer_fee(test.governed_multi_test.other.clone(), test.proxy, None)
-        .unwrap_err()
-        .downcast()
-        .unwrap();
-    assert_eq!(
-        err,
-        ContractError::Unauthorized {
-            addr: "other".to_string()
-        }
-    )
 }
 
 #[test]
@@ -341,10 +151,11 @@ fn bridge_nft_unapproved() {
         .unwrap();
     assert_eq!(
         err,
-        ContractError::MissingApproval {
+        ContractError::Governance(cw_ics721_governance::GovernanceError::MissingApproval {
             spender: test.proxy.to_string(),
-            collection: test.governed_multi_test.cw721s[0].to_string()
-        }
+            collection: test.governed_multi_test.cw721s[0].to_string(),
+            token: token_id,
+        })
     )
 }
 
@@ -380,7 +191,12 @@ fn bridge_nft_no_payment() {
         .unwrap();
     assert_eq!(
         err,
-        ContractError::IncorrectPaymentAmount(coin(0, "uark"), transfer_fee)
+        ContractError::Governance(
+            cw_ics721_governance::GovernanceError::IncorrectPaymentAmount(
+                coin(0, "uark"),
+                transfer_fee
+            )
+        )
     )
 }
 
@@ -409,7 +225,12 @@ fn send_nft_no_payment() {
         .unwrap();
     assert_eq!(
         err,
-        ContractError::IncorrectPaymentAmount(coin(0, "uark"), transfer_fee)
+        ContractError::Governance(
+            cw_ics721_governance::GovernanceError::IncorrectPaymentAmount(
+                coin(0, "uark"),
+                transfer_fee
+            )
+        )
     )
 }
 
@@ -467,7 +288,12 @@ fn send_nft_correct_payment() {
         .unwrap();
     assert_eq!(
         err,
-        ContractError::IncorrectPaymentAmount(coin(0, "uark"), transfer_fee) // proxy receive 0 coins
+        ContractError::Governance(
+            cw_ics721_governance::GovernanceError::IncorrectPaymentAmount(
+                coin(0, "uark"),
+                transfer_fee
+            )
+        ) // proxy receive 0 coins
     )
 }
 
@@ -496,7 +322,12 @@ fn bridge_nft_insufficient_payment() {
         .unwrap();
     assert_eq!(
         err,
-        ContractError::IncorrectPaymentAmount(coin(50, "uark"), transfer_fee)
+        ContractError::Governance(
+            cw_ics721_governance::GovernanceError::IncorrectPaymentAmount(
+                coin(50, "uark"),
+                transfer_fee
+            )
+        )
     )
 }
 
@@ -525,7 +356,12 @@ fn send_nft_insufficient_payment() {
         .unwrap();
     assert_eq!(
         err,
-        ContractError::IncorrectPaymentAmount(coin(0, "uark"), transfer_fee) // proxy receive 0 coins
+        ContractError::Governance(
+            cw_ics721_governance::GovernanceError::IncorrectPaymentAmount(
+                coin(0, "uark"),
+                transfer_fee
+            )
+        ) // proxy receive 0 coins
     )
 }
 
@@ -561,7 +397,12 @@ fn bridge_nft_higher_payment() {
         .unwrap();
     assert_eq!(
         err,
-        ContractError::IncorrectPaymentAmount(coin(150, "uark"), transfer_fee)
+        ContractError::Governance(
+            cw_ics721_governance::GovernanceError::IncorrectPaymentAmount(
+                coin(150, "uark"),
+                transfer_fee
+            )
+        )
     )
 }
 
@@ -597,6 +438,11 @@ fn send_nft_higher_payment() {
         .unwrap();
     assert_eq!(
         err,
-        ContractError::IncorrectPaymentAmount(coin(0, "uark"), transfer_fee) // proxy receive 0 coins
+        ContractError::Governance(
+            cw_ics721_governance::GovernanceError::IncorrectPaymentAmount(
+                coin(0, "uark"),
+                transfer_fee
+            )
+        ) // proxy receive 0 coins
     )
 }

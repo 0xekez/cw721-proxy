@@ -1,8 +1,13 @@
+use cosmwasm_schema::cw_serde;
 use cosmwasm_std::{coin, to_binary, Addr, Coin, Empty, IbcTimeout, IbcTimeoutBlock, StdResult};
 use cw721_base::ExecuteMsg as Cw721ExecuteMsg;
-use cw721_governed_proxy::msg::ExecuteMsg;
+use cw_ics721_governance::{cw_ics721_governance_execute, Action};
 use cw_multi_test::{App, AppResponse, Contract, ContractWrapper, Executor};
 use ibc_outgoing_msg::IbcOutgoingMsg;
+
+#[cw_ics721_governance_execute]
+#[cw_serde]
+pub enum ExecuteMsg {}
 
 pub struct Test {
     pub app: App,
@@ -139,11 +144,11 @@ impl Test {
         let res = self.app.execute_contract(
             sender,
             proxy,
-            &ExecuteMsg::BridgeNft {
+            &ExecuteMsg::Governance(Action::BridgeNft {
                 collection: collection.to_string(),
                 token_id,
                 msg: to_binary(&self.ibc_outgoing_msg(channel_id))?,
-            },
+            }),
             &funds,
         )?;
 
@@ -187,9 +192,12 @@ impl Test {
         proxy: Addr,
         addr: Addr,
     ) -> Result<AppResponse, anyhow::Error> {
-        let res =
-            self.app
-                .execute_contract(sender, proxy, &ExecuteMsg::Owner(addr.to_string()), &[])?;
+        let res = self.app.execute_contract(
+            sender,
+            proxy,
+            &ExecuteMsg::Governance(Action::Owner(addr.to_string())),
+            &[],
+        )?;
 
         Ok(res)
     }
@@ -200,9 +208,12 @@ impl Test {
         proxy: Addr,
         addr: Addr,
     ) -> Result<AppResponse, anyhow::Error> {
-        let res =
-            self.app
-                .execute_contract(sender, proxy, &ExecuteMsg::Origin(addr.to_string()), &[])?;
+        let res = self.app.execute_contract(
+            sender,
+            proxy,
+            &ExecuteMsg::Governance(Action::Origin(addr.to_string())),
+            &[],
+        )?;
 
         Ok(res)
     }
@@ -217,10 +228,10 @@ impl Test {
         let res = self.app.execute_contract(
             sender,
             proxy,
-            &ExecuteMsg::SendFunds {
+            &ExecuteMsg::Governance(Action::SendFunds {
                 to_address,
                 amount: amount.clone(),
-            },
+            }),
             &[amount],
         )?;
 
@@ -236,7 +247,7 @@ impl Test {
         let res = self.app.execute_contract(
             sender,
             proxy,
-            &ExecuteMsg::TransferFee(transfer_fee),
+            &ExecuteMsg::Governance(Action::TransferFee(transfer_fee)),
             &[],
         )?;
 

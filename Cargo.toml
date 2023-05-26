@@ -1,9 +1,13 @@
 [workspace]
-members = ["contracts/*", "packages/*", "debug/*"]
+members   = ["contracts/*", "packages/*", "debug/*"]
 
 [workspace.package]
+authors   = ["Mr T <mr-t@arkprotocol.io>"]
 edition    = "2021"
-version    = "0.0.1"
+homepage   = "https://arkprotocol.io"
+repository = "https://github.com/arkprotocol/cw721-proxy/"
+license   = "Apache-2.0"
+keywords   = ["cosmos", "cosmwasm"]
 
 [workspace.dependencies]
 cosmwasm-std = "1.1"
@@ -16,6 +20,8 @@ cw721-proxy-derive = { path = "./packages/cw721-proxy-derive", version = "*" }
 cw721-whitelist = { path = "./packages/cw721-whitelist", version = "*" }
 cw721-whitelist-map = { path = "./packages/cw721-whitelist-map", version = "*" }
 cw721-governed-proxy = { path = "./contracts/cw721-governed-proxy", version = "*" }
+cw-ics721-governance = { path = "./packages/cw-ics721-governance", version = "*" }
+cw-ics721-governance-derive = { path = "./packages/cw-ics721-governance/derive", version = "*" }
 cw-rate-limiter = { path = "./packages/cw-rate-limiter", version = "*" }
 cw-utils = "0.16.0"
 ibc-outgoing-msg = { path = "./packages/ibc-outgoing-msg", version = "*" }

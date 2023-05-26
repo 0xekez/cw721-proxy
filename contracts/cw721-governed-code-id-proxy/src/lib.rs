@@ -1,8 +1,10 @@
+use cosmwasm_std::{Binary, DepsMut, Env, MessageInfo, Response, Storage};
+use cw721::Cw721ReceiveMsg;
+use error::ContractError;
+use state::WHITELIST;
+
 pub mod error;
-pub mod execute;
-pub mod instantiate;
 pub mod msg;
-pub mod query;
 pub mod state;
 
 #[cfg(test)]
@@ -12,22 +14,34 @@ mod tests;
 pub mod entry {
     use crate::error::ContractError;
     use crate::msg::{ExecuteMsg, InstantiateMsg, MigrateMsg, QueryMsg};
-    use crate::state::{Cw721GovernedCodeIdProxy, CONTRACT_NAME, CONTRACT_VERSION};
+    use crate::state::{CONTRACT_NAME, CONTRACT_VERSION, WHITELIST};
+    use crate::{
+        execute_add_to_whitelist, execute_bridge_nft, execute_clear_whitelist, execute_receive_nft,
+        execute_remove_from_whitelist,
+    };
 
-    use cosmwasm_std::entry_point;
+    use cosmwasm_std::{entry_point, to_binary};
     use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult};
     use cw2::set_contract_version;
+    use cw_ics721_governance::Action;
 
     // This makes a conscious choice on the various generics used by the contract
     #[entry_point]
     pub fn instantiate(
         deps: DepsMut,
-        env: Env,
+        _env: Env,
         info: MessageInfo,
         msg: InstantiateMsg,
-    ) -> Result<Response, ContractError> {
+    ) -> StdResult<Response> {
         set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
-        Cw721GovernedCodeIdProxy::default().instantiate(deps, env, info, msg)
+        WHITELIST.init(deps.storage, &msg.whitelist)?;
+        let res =
+            cw_ics721_governance::instantiate(deps, info, msg.owner, msg.origin, msg.transfer_fee)?;
+        Ok(res.add_attribute(
+            "whitelist".to_string(),
+            msg.whitelist
+                .map_or("none".to_string(), |w| format!("{:?}", w)),
+        ))
     }
 
     #[entry_point]
@@ -37,16 +51,39 @@ pub mod entry {
         info: MessageInfo,
         msg: ExecuteMsg,
     ) -> Result<Response, ContractError> {
-        Cw721GovernedCodeIdProxy::default().execute(deps, env, info, msg)
+        match msg {
+            ExecuteMsg::Governance(Action::BridgeNft {
+                collection,
+                token_id,
+                msg,
+            }) => execute_bridge_nft(deps, env, info, collection, token_id, msg),
+            ExecuteMsg::Governance(action) => {
+                Ok(cw_ics721_governance::execute(deps, env, &info, action)?)
+            }
+            ExecuteMsg::ReceiveNft(msg) => execute_receive_nft(deps, env, info, msg),
+            ExecuteMsg::AddToWhitelist { value } => {
+                execute_add_to_whitelist(deps, env, info, &value)
+            }
+            ExecuteMsg::RemoveFromWhitelist { value } => {
+                execute_remove_from_whitelist(deps, env, info, &value)
+            }
+            ExecuteMsg::ClearWhitelist() => execute_clear_whitelist(deps, env, info),
+        }
     }
 
     #[entry_point]
-    pub fn query(deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
-        Cw721GovernedCodeIdProxy::default().query(deps, env, msg)
+    pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
+        match msg {
+            QueryMsg::Governance() => cw_ics721_governance::query_governance(deps.storage),
+            QueryMsg::Whitelist {} => to_binary(&WHITELIST.query_whitelist(deps.storage)?),
+            QueryMsg::Whitelisted { value } => {
+                to_binary(&WHITELIST.query_is_whitelisted(deps.storage, &value)?)
+            }
+        }
     }
 
     #[entry_point]
-    pub fn migrate(deps: DepsMut, env: Env, msg: MigrateMsg) -> StdResult<Response> {
+    pub fn migrate(deps: DepsMut, _env: Env, msg: MigrateMsg) -> StdResult<Response> {
         // Set contract to version to latest
         set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
         match msg {
@@ -58,24 +95,84 @@ pub mod entry {
             } => {
                 if let Some(list) = whitelist.clone() {
                     list.iter()
-                        .map(|item| {
-                            Cw721GovernedCodeIdProxy::default()
-                                .whitelist
-                                .add(deps.storage, item)
-                        })
+                        .map(|item| WHITELIST.add(deps.storage, item))
                         .collect::<StdResult<Vec<_>>>()?;
                 }
-                let res = Cw721GovernedCodeIdProxy::default().governance.migrate(
-                    deps,
-                    env,
-                    cw721_governed_proxy::msg::MigrateMsg::WithUpdate {
-                        origin,
-                        owner,
-                        transfer_fee,
-                    },
-                )?;
-                Ok(res.add_attribute("whitelist", format!("{:?}", whitelist)))
+                let res = cw_ics721_governance::migrate(deps, owner, origin, transfer_fee)?;
+                Ok(res.add_attribute(
+                    "whitelist".to_string(),
+                    whitelist.map_or("none".to_string(), |w| format!("{:?}", w)),
+                ))
             }
         }
+    }
+}
+
+pub fn execute_add_to_whitelist(
+    deps: DepsMut,
+    _env: Env,
+    info: MessageInfo,
+    value: &u64,
+) -> Result<Response, ContractError> {
+    cw_ics721_governance::assert_owner(deps.storage, &info.sender)?;
+    WHITELIST.add(deps.storage, value)?;
+    Ok(Response::default()
+        .add_attribute("method", "execute_add_to_whitelist")
+        .add_attribute("value", value.to_string()))
+}
+
+pub fn execute_remove_from_whitelist(
+    deps: DepsMut,
+    _env: Env,
+    info: MessageInfo,
+    value: &u64,
+) -> Result<Response, ContractError> {
+    cw_ics721_governance::assert_owner(deps.storage, &info.sender)?;
+    WHITELIST.remove(deps.storage, value)?;
+    Ok(Response::default()
+        .add_attribute("method", "execute_remove_from_whitelist")
+        .add_attribute("value", value.to_string()))
+}
+
+pub fn execute_clear_whitelist(
+    deps: DepsMut,
+    _env: Env,
+    info: MessageInfo,
+) -> Result<Response, ContractError> {
+    cw_ics721_governance::assert_owner(deps.storage, &info.sender)?;
+    WHITELIST.clear(deps.storage)?;
+    Ok(Response::default().add_attribute("method", "execute_clear_whitelist"))
+}
+
+pub fn execute_receive_nft(
+    deps: DepsMut,
+    _env: Env,
+    info: MessageInfo,
+    msg: Cw721ReceiveMsg,
+) -> Result<Response, ContractError> {
+    let contract_info = deps.querier.query_wasm_contract_info(info.sender.clone())?;
+    is_whitelisted(deps.storage, contract_info.code_id)?;
+    Ok(cw_ics721_governance::execute_receive_nft(deps, info, msg)?)
+}
+
+pub fn execute_bridge_nft(
+    deps: DepsMut,
+    env: Env,
+    info: MessageInfo,
+    collection: String,
+    token_id: String,
+    msg: Binary,
+) -> Result<Response, ContractError> {
+    let contract_info = deps.querier.query_wasm_contract_info(collection.clone())?;
+    is_whitelisted(deps.storage, contract_info.code_id)?;
+    Ok(cw_ics721_governance::execute_bridge_nft(
+        deps, env, &info, collection, token_id, msg,
+    )?)
+}
+
+pub fn is_whitelisted(storage: &dyn Storage, requestee: u64) -> Result<(), ContractError> {
+    match WHITELIST.query_is_whitelisted(storage, &requestee)? {
+        true => Ok(()),
+        false => Err(ContractError::NotWhitelisted { requestee }),
     }
 }

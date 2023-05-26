@@ -1,9 +1,13 @@
 [package]
-name = "cw721-governed_code-id-proxy"
-license = "BSD-3"
-authors = ["Mr T <mr-t@arkprotocol.io>"]
-edition = "2021"
-version = "0.0.1"
+name        = "cw721-governed_code-id-proxy"
+version     = "0.0.1"
+description = "TODO"
+license     = { workspace = true }
+authors     = { workspace = true }
+edition     = { workspace = true }
+homepage    = { workspace = true }
+repository  = { workspace = true }
+keywords    = { workspace = true }
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -24,6 +28,8 @@ cw721-proxy = { workspace = true }
 cw721-proxy-derive = { workspace = true }
 cw721-whitelist = { workspace = true }
 cw721-governed-proxy = { workspace = true, features = ["library"] }
+cw-ics721-governance = { workspace = true}
+ibc-outgoing-msg = { workspace = true }
 thiserror = { workspace = true }
 
 [dev-dependencies]

@@ -1,6 +1,6 @@
 use cosmwasm_std::{coin, to_binary, Addr, Coin, Empty};
-use cw721_governed_proxy::error::ContractError as GovernedContractError;
 use cw721_proxy_multi_test::Test as GovernedMultiTest;
+use cw_ics721_governance::{Action, GovernanceError};
 use cw_multi_test::{AppResponse, Contract, ContractWrapper, Executor};
 use cw_rate_limiter::Rate;
 
@@ -84,24 +84,16 @@ impl Test {
         let res = self.governed_multi_test.app.execute_contract(
             sender,
             proxy,
-            &ExecuteMsg::BridgeNft {
+            &ExecuteMsg::Governance(Action::BridgeNft {
                 collection: collection.to_string(),
                 token_id,
                 msg: to_binary(&self.governed_multi_test.ibc_outgoing_msg(channel_id))?,
-            },
+            }),
             &funds,
         )?;
 
         Ok(res)
     }
-}
-
-#[test]
-fn rate_limit_authorized() {
-    let transfer_fee = Some(coin(100, "uark"));
-    let mut test = Test::new(1, transfer_fee, Rate::Blocks(1), true);
-    test.execute_rate_limit(test.governed_multi_test.minter.clone(), Rate::Blocks(1))
-        .unwrap();
 }
 
 #[test]
@@ -117,7 +109,15 @@ fn rate_limit_is_zero() {
 }
 
 #[test]
-fn rate_limit_unauthorized() {
+fn rate_limit_owner() {
+    let transfer_fee = Some(coin(100, "uark"));
+    let mut test = Test::new(1, transfer_fee, Rate::Blocks(1), true);
+    test.execute_rate_limit(test.governed_multi_test.minter.clone(), Rate::Blocks(1))
+        .unwrap();
+}
+
+#[test]
+fn rate_limit_no_owner() {
     let transfer_fee = Some(coin(100, "uark"));
     let mut test = Test::new(1, transfer_fee, Rate::Blocks(1), false);
     let err: ContractError = test
@@ -125,11 +125,21 @@ fn rate_limit_unauthorized() {
         .unwrap_err()
         .downcast()
         .unwrap();
+    assert_eq!(err, ContractError::Governance(GovernanceError::NoOwner))
+}
+
+#[test]
+fn rate_limit_not_owner() {
+    let transfer_fee = Some(coin(100, "uark"));
+    let mut test = Test::new(1, transfer_fee, Rate::Blocks(1), true);
+    let err: ContractError = test
+        .execute_rate_limit(Addr::unchecked("unauthorized"), Rate::Blocks(1))
+        .unwrap_err()
+        .downcast()
+        .unwrap();
     assert_eq!(
         err,
-        ContractError::GovernanceError(GovernedContractError::Unauthorized {
-            addr: "unauthorized".to_string()
-        })
+        ContractError::Governance(GovernanceError::NotOwner("unauthorized".to_string()))
     )
 }
 
