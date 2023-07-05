@@ -1,6 +1,27 @@
 [workspace]
 members = ["contracts/*", "packages/*", "debug/*"]
 
+[workspace.dependencies]
+anyhow = "1.0"
+cosmwasm-std = "1.1"
+cosmwasm-schema = "1.1"
+cw-storage-plus = "1.1"
+cw-multi-test = "0.16"
+cw2 = "1.1"
+cw721 = "0.18"
+cw721-base = "0.18"
+cw721-proxy = { path = "./packages/cw721-proxy", version = "*" }
+cw721-proxy-derive = { path = "./packages/cw721-proxy-derive", version = "*" }
+cw721-proxy-tester = { path = "./debug/cw721-proxy-tester", version = "*" }
+cw-rate-limiter = { path = "./packages/cw-rate-limiter", version = "*" }
+quote = "1.0"
+rand = "0.8"
+syn = "1.0"
+schemars = "0.8"
+serde = "1.0"
+thiserror = "1.0"
+proc-macro2 = "1.0"
+
 [profile.release]
 codegen-units = 1
 opt-level = 3

@@ -98,12 +98,12 @@ impl Test {
         self.app.execute_contract(
             self.minter.clone(),
             nft.clone(),
-            &cw721_base::msg::ExecuteMsg::<Empty, Empty>::Mint(cw721_base::MintMsg::<Empty> {
+            &cw721_base::msg::ExecuteMsg::<Empty, Empty>::Mint {
                 token_id: self.nfts_minted.to_string(),
                 owner: self.minter.to_string(),
                 token_uri: None,
                 extension: Default::default(),
-            }),
+            },
             &[],
         )?;
         self.app.execute_contract(
