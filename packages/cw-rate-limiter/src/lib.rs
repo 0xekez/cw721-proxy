@@ -4,7 +4,7 @@ use cosmwasm_schema::cw_serde;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use cosmwasm_std::{Env, StdError, StdResult, Storage};
+use cosmwasm_std::{Env, StdError, Storage};
 use cw_storage_plus::{Item, Map};
 use thiserror::Error;
 
@@ -34,6 +34,9 @@ pub enum RateLimitError {
     #[error(transparent)]
     Std(#[from] StdError),
 
+    #[error("rate must be non-zero")]
+    ZeroRate,
+
     #[error("rate limit reached for key ({key}). blocks until next chance: ({blocks_remaining})")]
     Limited { key: String, blocks_remaining: u64 },
 }
@@ -46,8 +49,12 @@ impl<'a> RateLimiter<'a, '_> {
         }
     }
 
-    pub fn init(&self, storage: &mut dyn Storage, rate_limit: &Rate) -> StdResult<()> {
-        self.rate_limit.save(storage, rate_limit)
+    pub fn init(&self, storage: &mut dyn Storage, rate_limit: &Rate) -> Result<(), RateLimitError> {
+        if rate_limit.is_zero() {
+            return Err(RateLimitError::ZeroRate {});
+        }
+        self.rate_limit.save(storage, rate_limit)?;
+        Ok(())
     }
 
     pub fn limit(
@@ -152,32 +159,4 @@ impl Ord for Rate {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_cmp() {
-        assert_eq!(Rate::PerBlock(1), Rate::Blocks(1));
-        assert_ne!(Rate::PerBlock(0), Rate::Blocks(0));
-        assert!(Rate::PerBlock(2) > Rate::Blocks(1));
-        assert!(Rate::Blocks(2) < Rate::Blocks(1));
-        assert!(Rate::PerBlock(2) > Rate::PerBlock(1));
-        assert!(Rate::PerBlock(2) > Rate::Blocks(1));
-    }
-
-    #[test]
-    fn test_infinity() {
-        let infinity = Rate::Blocks(0);
-        // bitwise not. largest possible u64.
-        assert!(Rate::PerBlock(!0) < infinity);
-        assert!(infinity.is_infinite());
-        assert!(!Rate::PerBlock(!0).is_infinite());
-    }
-
-    #[test]
-    fn test_zero() {
-        let zero = Rate::PerBlock(0);
-        assert!(zero.is_zero());
-        assert!(zero < Rate::Blocks(!0));
-    }
-}
+mod tests;
