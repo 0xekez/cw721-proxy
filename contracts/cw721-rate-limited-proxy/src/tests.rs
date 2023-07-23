@@ -2,10 +2,7 @@ use cosmwasm_std::{to_binary, Addr, Empty};
 use cw_multi_test::{next_block, App, Contract, ContractWrapper, Executor};
 use cw_rate_limiter::{Rate, RateLimitError};
 
-use crate::{
-    error::ContractError,
-    msg::{InstantiateMsg, QueryMsg},
-};
+use crate::msg::{InstantiateMsg, QueryMsg};
 
 struct Test {
     pub app: App,
@@ -233,17 +230,17 @@ fn test_simple_rate_limited() {
     let actual = Rate::PerBlock(2);
     let expected = Rate::Blocks(4);
     let mut test = Test::new(1, expected);
-    let err: ContractError = test
+    let err: RateLimitError = test
         .send_nfts_at_rate(test.cw721s[0].clone(), actual, 1)
         .unwrap_err()
         .downcast()
         .unwrap();
     assert_eq!(
         err,
-        ContractError::Rate(RateLimitError::Limited {
+        RateLimitError::Limited {
             blocks_remaining: 4,
             key: test.cw721s[0].to_string(),
-        })
+        }
     )
 }
 
@@ -258,31 +255,31 @@ fn test_multikey_rate_limit() {
         .unwrap();
     test.send_nft_and_check_received(test.cw721s[1].clone())
         .unwrap();
-    let err: ContractError = test
+    let err: RateLimitError = test
         .send_nft_and_check_received(test.cw721s[0].clone())
         .unwrap_err()
         .downcast()
         .unwrap();
     assert_eq!(
         err,
-        ContractError::Rate(RateLimitError::Limited {
+        RateLimitError::Limited {
             key: test.cw721s[0].to_string(),
             blocks_remaining: 1
-        })
+        }
     );
     test.send_nft_and_check_received(test.cw721s[1].clone())
         .unwrap();
-    let err: ContractError = test
+    let err: RateLimitError = test
         .send_nft_and_check_received(test.cw721s[1].clone())
         .unwrap_err()
         .downcast()
         .unwrap();
     assert_eq!(
         err,
-        ContractError::Rate(RateLimitError::Limited {
+        RateLimitError::Limited {
             key: test.cw721s[1].to_string(),
             blocks_remaining: 1
-        })
+        }
     );
 
     test.app.update_block(next_block);
@@ -402,7 +399,7 @@ fn test_zero_rate_instantiate() {
     let mut app = App::default();
     let rate_limiter_id = app.store_code(cw721_rate_limiter());
 
-    let err: ContractError = app
+    let err: RateLimitError = app
         .instantiate_contract(
             rate_limiter_id,
             Addr::unchecked("zeke"),
@@ -417,7 +414,7 @@ fn test_zero_rate_instantiate() {
         .unwrap_err()
         .downcast()
         .unwrap();
-    assert_eq!(err, ContractError::ZeroRate {});
+    assert_eq!(err, RateLimitError::ZeroRate {});
 
     let infinity = Rate::Blocks(0);
     assert!(infinity.is_infinite());

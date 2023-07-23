@@ -6,9 +6,8 @@ use cosmwasm_std::{
 use cw2::set_contract_version;
 use cw721_proxy::ProxyExecuteMsg;
 
-use cw_rate_limiter::Rate;
+use cw_rate_limiter::{Rate, RateLimitError};
 
-use crate::error::ContractError;
 use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::state::{ORIGIN, RATE_LIMIT};
 
@@ -21,7 +20,7 @@ pub fn instantiate(
     _env: Env,
     info: MessageInfo,
     msg: InstantiateMsg,
-) -> Result<Response, ContractError> {
+) -> Result<Response, RateLimitError> {
     set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
     ORIGIN.save(
         deps.storage,
@@ -30,19 +29,15 @@ pub fn instantiate(
             .transpose()?
             .unwrap_or(info.sender),
     )?;
-    if msg.rate_limit.is_zero() {
-        Err(ContractError::ZeroRate {})
-    } else {
-        let (rate, units) = match msg.rate_limit {
-            Rate::PerBlock(rate) => (rate, "nfts_per_block"),
-            Rate::Blocks(rate) => (rate, "blocks_per_nft"),
-        };
-        RATE_LIMIT.init(deps.storage, &msg.rate_limit)?;
-        Ok(Response::default()
-            .add_attribute("method", "instantiate")
-            .add_attribute("rate", rate.to_string())
-            .add_attribute("units", units))
-    }
+    let (rate, units) = match msg.rate_limit {
+        Rate::PerBlock(rate) => (rate, "nfts_per_block"),
+        Rate::Blocks(rate) => (rate, "blocks_per_nft"),
+    };
+    RATE_LIMIT.init(deps.storage, &msg.rate_limit)?;
+    Ok(Response::default()
+        .add_attribute("method", "instantiate")
+        .add_attribute("rate", rate.to_string())
+        .add_attribute("units", units))
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
@@ -51,7 +46,7 @@ pub fn execute(
     env: Env,
     info: MessageInfo,
     msg: ExecuteMsg,
-) -> Result<Response, ContractError> {
+) -> Result<Response, RateLimitError> {
     match msg {
         ExecuteMsg::ReceiveNft(msg) => execute_receive_nft(deps, env, info, msg),
     }
@@ -62,7 +57,7 @@ pub fn execute_receive_nft(
     env: Env,
     info: MessageInfo,
     msg: cw721::Cw721ReceiveMsg,
-) -> Result<Response, ContractError> {
+) -> Result<Response, RateLimitError> {
     RATE_LIMIT.limit(deps.storage, &env.block, info.sender.as_str())?;
     Ok(Response::default().add_message(WasmMsg::Execute {
         contract_addr: ORIGIN.load(deps.storage)?.into_string(),
