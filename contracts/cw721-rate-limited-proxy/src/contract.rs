@@ -63,7 +63,7 @@ pub fn execute_receive_nft(
     info: MessageInfo,
     msg: cw721::Cw721ReceiveMsg,
 ) -> Result<Response, ContractError> {
-    RATE_LIMIT.limit(deps.storage, &env, info.sender.as_str())?;
+    RATE_LIMIT.limit(deps.storage, &env.block, info.sender.as_str())?;
     Ok(Response::default().add_message(WasmMsg::Execute {
         contract_addr: ORIGIN.load(deps.storage)?.into_string(),
         msg: to_binary(&ProxyExecuteMsg::ReceiveProxyNft {

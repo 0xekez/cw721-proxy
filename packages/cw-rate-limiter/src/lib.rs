@@ -4,7 +4,7 @@ use cosmwasm_schema::cw_serde;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use cosmwasm_std::{Env, StdError, Storage};
+use cosmwasm_std::{BlockInfo, StdError, Storage};
 use cw_storage_plus::{Item, Map};
 use thiserror::Error;
 
@@ -60,7 +60,7 @@ impl<'a> RateLimiter<'a, '_> {
     pub fn limit(
         &self,
         storage: &mut dyn Storage,
-        env: &Env,
+        block: &BlockInfo,
         key: &str,
     ) -> Result<(), RateLimitError> {
         let RateInfo {
@@ -69,7 +69,7 @@ impl<'a> RateLimiter<'a, '_> {
         } = self.rates.may_load(storage, key)?.unwrap_or_default();
         let next_value = match self.rate_limit.load(storage)? {
             Rate::PerBlock(limit) => {
-                let this_block = if last_updated_height == env.block.height {
+                let this_block = if last_updated_height == block.height {
                     this_block + 1
                 } else {
                     1
@@ -84,7 +84,7 @@ impl<'a> RateLimiter<'a, '_> {
                 this_block
             }
             Rate::Blocks(min_blocks) => {
-                let elapsed = env.block.height.saturating_sub(last_updated_height);
+                let elapsed = block.height.saturating_sub(last_updated_height);
                 if elapsed < min_blocks {
                     return Err(RateLimitError::Limited {
                         blocks_remaining: min_blocks - elapsed,
@@ -98,7 +98,7 @@ impl<'a> RateLimiter<'a, '_> {
             storage,
             key,
             &RateInfo {
-                last_updated_height: env.block.height,
+                last_updated_height: block.height,
                 this_block: next_value,
             },
         )?;
