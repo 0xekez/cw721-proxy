@@ -11,13 +11,13 @@ fn test_init() {
         .init(deps.as_mut().storage, &Rate::Blocks(0))
         .unwrap();
     let rate_limit = rate_limiter.query_limit(deps.as_mut().storage).unwrap();
-    assert_eq!(rate_limit, Rate::Blocks(0));
+    assert_eq!(rate_limit, Some(Rate::Blocks(0)));
     // set PerBlocks limit
     rate_limiter
         .init(deps.as_mut().storage, &&Rate::PerBlock(1))
         .unwrap();
     let rate_limit = rate_limiter.query_limit(deps.as_mut().storage).unwrap();
-    assert_eq!(rate_limit, Rate::PerBlock(1));
+    assert_eq!(rate_limit, Some(Rate::PerBlock(1)));
     // set PerBlocks limit
     let error = rate_limiter
         .init(deps.as_mut().storage, &&Rate::PerBlock(0))

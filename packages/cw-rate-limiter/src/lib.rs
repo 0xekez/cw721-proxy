@@ -105,8 +105,8 @@ impl<'a> RateLimiter<'a, '_> {
         Ok(())
     }
 
-    pub fn query_limit(&self, storage: &dyn Storage) -> Result<Rate, StdError> {
-        self.rate_limit.load(storage)
+    pub fn query_limit(&self, storage: &dyn Storage) -> Result<Option<Rate>, StdError> {
+        self.rate_limit.may_load(storage)
     }
 }
 
