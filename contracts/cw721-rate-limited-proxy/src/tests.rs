@@ -171,7 +171,7 @@ impl InstantiateMsg {
 
 fn cw721_rate_limiter() -> Box<dyn Contract<Empty>> {
     let contract = ContractWrapper::new(
-        crate::contract::execute,
+        crate::contract::execute::<Empty>,
         crate::contract::instantiate,
         crate::contract::query,
     );

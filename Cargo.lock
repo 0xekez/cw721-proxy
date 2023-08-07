@@ -537,6 +537,7 @@ dependencies = [
  "cw721-proxy-derive",
  "cw721-proxy-tester",
  "rand",
+ "serde",
  "thiserror",
 ]
 
