@@ -1,7 +1,7 @@
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
-    to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, WasmMsg,
+    to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, WasmMsg,
 };
 use cw2::set_contract_version;
 use cw721_proxy::ProxyExecuteMsg;
@@ -71,7 +71,7 @@ where
     RATE_LIMIT.limit(deps.storage, &env.block, info.sender.as_str())?;
     Ok(Response::default().add_message(WasmMsg::Execute {
         contract_addr: ORIGIN.load(deps.storage)?.into_string(),
-        msg: to_binary(&ProxyExecuteMsg::ReceiveProxyNft {
+        msg: to_json_binary(&ProxyExecuteMsg::ReceiveProxyNft {
             eyeball: info.sender.into_string(),
             msg,
         })?,
@@ -82,7 +82,7 @@ where
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
-        QueryMsg::RateLimit {} => to_binary(&RATE_LIMIT.query_limit(deps.storage)?),
-        QueryMsg::Origin {} => to_binary(&ORIGIN.load(deps.storage)?),
+        QueryMsg::RateLimit {} => to_json_binary(&RATE_LIMIT.query_limit(deps.storage)?),
+        QueryMsg::Origin {} => to_json_binary(&ORIGIN.load(deps.storage)?),
     }
 }

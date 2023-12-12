@@ -14,13 +14,13 @@ fn test_init() {
     assert_eq!(rate_limit, Some(Rate::Blocks(0)));
     // set PerBlocks limit
     rate_limiter
-        .init(deps.as_mut().storage, &&Rate::PerBlock(1))
+        .init(deps.as_mut().storage, &Rate::PerBlock(1))
         .unwrap();
     let rate_limit = rate_limiter.query_limit(deps.as_mut().storage).unwrap();
     assert_eq!(rate_limit, Some(Rate::PerBlock(1)));
     // set PerBlocks limit
     let error = rate_limiter
-        .init(deps.as_mut().storage, &&Rate::PerBlock(0))
+        .init(deps.as_mut().storage, &Rate::PerBlock(0))
         .unwrap_err();
     assert_eq!(error, RateLimitError::ZeroRate);
 }

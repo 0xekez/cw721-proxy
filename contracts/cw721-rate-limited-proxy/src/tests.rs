@@ -1,4 +1,4 @@
-use cosmwasm_std::{to_binary, Addr, Empty};
+use cosmwasm_std::{to_json_binary, Addr, Empty};
 use cw_multi_test::{next_block, App, Contract, ContractWrapper, Executor};
 use cw_rate_limiter::{Rate, RateLimitError};
 
@@ -109,7 +109,7 @@ impl Test {
             &cw721_base::msg::ExecuteMsg::<Empty, Empty>::SendNft {
                 contract: self.rate_limiter.to_string(),
                 token_id: self.nfts_minted.to_string(),
-                msg: to_binary("hello")?,
+                msg: to_json_binary("hello")?,
             },
             &[],
         )?;
@@ -127,7 +127,7 @@ impl Test {
                     cw721::Cw721ReceiveMsg {
                         sender: self.minter.to_string(),
                         token_id: self.nfts_minted.to_string(),
-                        msg: to_binary("hello")?
+                        msg: to_json_binary("hello")?
                     }
                 )
             }
@@ -319,7 +319,7 @@ fn fuzz_rate_limiting() {
 
         // Open state for next iteration.
         if let Rate::Blocks(blocks) = limit {
-            test.app.update_block(|mut b| b.height += blocks);
+            test.app.update_block(|b| b.height += blocks);
         } else {
             test.app.update_block(next_block)
         }
