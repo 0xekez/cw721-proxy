@@ -28,8 +28,7 @@ fn derive_execute_variants() {
 
     // If this compiles we have won.
     match msg {
-        ExecuteMsg::Ics721ReceivePacketMsg { .. }
-        | ExecuteMsg::Foo => "yay",
+        ExecuteMsg::Ics721ReceivePacketMsg { .. } | ExecuteMsg::Foo => "yay",
     };
 }
 

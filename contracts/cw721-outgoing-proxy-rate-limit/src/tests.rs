@@ -28,7 +28,7 @@ impl Test {
             .instantiate_contract(
                 proxy_tester_id,
                 minter.clone(),
-                &cw721_proxy_tester::msg::InstantiateMsg::default(),
+                &cw721_outgoing_proxy_tester::msg::InstantiateMsg::default(),
                 &[],
                 "proxy_tester",
                 None,
@@ -114,13 +114,13 @@ impl Test {
             &[],
         )?;
 
-        let msg: cw721_proxy_tester::msg::ExecuteMsg = self.app.wrap().query_wasm_smart(
+        let msg: cw721_outgoing_proxy_tester::msg::ExecuteMsg = self.app.wrap().query_wasm_smart(
             &self.mock_receiver,
-            &cw721_proxy_tester::msg::QueryMsg::LastMsg {},
+            &cw721_outgoing_proxy_tester::msg::QueryMsg::LastMsg {},
         )?;
 
         match msg {
-            cw721_proxy_tester::msg::ExecuteMsg::ReceiveProxyNft { eyeball, msg } => {
+            cw721_outgoing_proxy_tester::msg::ExecuteMsg::ReceiveProxyNft { eyeball, msg } => {
                 assert_eq!(eyeball, nft);
                 assert_eq!(
                     msg,
@@ -189,9 +189,9 @@ fn cw721_base() -> Box<dyn Contract<Empty>> {
 
 fn cw721_proxy_tester() -> Box<dyn Contract<Empty>> {
     let contract = ContractWrapper::new(
-        cw721_proxy_tester::contract::execute,
-        cw721_proxy_tester::contract::instantiate,
-        cw721_proxy_tester::contract::query,
+        cw721_outgoing_proxy_tester::contract::execute,
+        cw721_outgoing_proxy_tester::contract::instantiate,
+        cw721_outgoing_proxy_tester::contract::query,
     );
     Box::new(contract)
 }

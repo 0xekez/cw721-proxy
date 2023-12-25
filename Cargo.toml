@@ -19,9 +19,9 @@ cw2 = "^1.1"
 cw721 = "^0.18"
 cw721-base = "^0.18"
 cw-paginate-storage = { version = "^2.4", git = "https://github.com/DA0-DA0/dao-contracts.git" }
-cw721-proxy = { path = "./packages/cw721-proxy", version = "*" }
-cw721-proxy-derive = { path = "./packages/cw721-proxy-derive", version = "*" }
-cw721-proxy-tester = { path = "./debug/cw721-proxy-tester", version = "*" }
+cw721-outgoing-proxy = { path = "./packages/cw721-outgoing-proxy", version = "*" }
+cw721-outgoing-proxy-derive = { path = "./packages/cw721-outgoing-proxy-derive", version = "*" }
+cw721-outgoing-proxy-tester = { path = "./debug/cw721-outgoing-proxy-tester", version = "*" }
 cw-rate-limiter = { path = "./packages/cw-rate-limiter", version = "*" }
 cw-incoming-proxy = { path = "./packages/cw-incoming-proxy", version = "*" }
 cw-incoming-proxy-derive = { path = "./packages/cw-incoming-proxy/derive", version = "*" }

@@ -4,7 +4,7 @@ use cosmwasm_std::{
     to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, WasmMsg,
 };
 use cw2::set_contract_version;
-use cw721_proxy::ProxyExecuteMsg;
+use cw721_outgoing_proxy::ProxyExecuteMsg;
 use serde::{de::DeserializeOwned, Serialize};
 
 use cw_rate_limiter::{Rate, RateLimitError};
@@ -12,7 +12,7 @@ use cw_rate_limiter::{Rate, RateLimitError};
 use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::state::{ORIGIN, RATE_LIMIT};
 
-const CONTRACT_NAME: &str = "crates.io:cw721-proxy-rate-limit";
+const CONTRACT_NAME: &str = "crates.io:cw721-outgoing-proxy-rate-limit";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[cfg_attr(not(feature = "library"), entry_point)]

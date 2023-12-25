@@ -3,15 +3,15 @@ use quote::quote;
 use syn::{parse_macro_input, AttributeArgs, DataEnum, DeriveInput, Variant};
 
 /// Adds the nesecary fields to a enum such that it implements the
-/// cw721-proxy-receiver interface. You must have the cw721 Cargo
+/// cw721-outgoing-proxy-receiver interface. You must have the cw721 Cargo
 /// package avaliable as a dependency to use this macro.
 ///
 /// For example:
 ///
 /// ```
-/// use cw721_proxy_derive::cw721_proxy;
+/// use cw721_outgoing_proxy_derive::cw721_outgoing_proxy;
 ///
-/// #[cw721_proxy]
+/// #[cw721_outgoing_proxy]
 /// enum ExecuteMsg {}
 /// ```
 ///
@@ -32,10 +32,10 @@ use syn::{parse_macro_input, AttributeArgs, DataEnum, DeriveInput, Variant};
 /// occurs before the addition of the field.
 ///
 /// ```compile_fail
-/// use cw721_proxy_derive::cw721_proxy;
+/// use cw721_outgoing_proxy_derive::cw721_outgoing_proxy;
 ///
 /// #[derive(Clone)]
-/// #[cw721_proxy]
+/// #[cw721_outgoing_proxy]
 /// #[allow(dead_code)]
 /// enum Test {
 ///     Foo,
@@ -44,7 +44,7 @@ use syn::{parse_macro_input, AttributeArgs, DataEnum, DeriveInput, Variant};
 /// }
 /// ```
 #[proc_macro_attribute]
-pub fn cw721_proxy(metadata: TokenStream, input: TokenStream) -> TokenStream {
+pub fn cw721_outgoing_proxy(metadata: TokenStream, input: TokenStream) -> TokenStream {
     // Make sure that no arguments were passed in.
     let args = parse_macro_input!(metadata as AttributeArgs);
     if let Some(first_arg) = args.first() {

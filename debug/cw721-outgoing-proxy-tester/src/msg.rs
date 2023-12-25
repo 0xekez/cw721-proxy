@@ -1,5 +1,5 @@
 use cosmwasm_schema::cw_serde;
-pub use cw721_proxy::ProxyExecuteMsg as ExecuteMsg;
+pub use cw721_outgoing_proxy::ProxyExecuteMsg as ExecuteMsg;
 
 #[cw_serde]
 #[derive(Default)]
