@@ -224,6 +224,43 @@ dependencies = [
 ]
 
 [[package]]
+name = "cw-cii"
+version = "0.1.0"
+source = "git+https://github.com/arkprotocol/ark-ics721?branch=incoming_proxy#e51034349d8ca0697c59880f1ded966899be0fc0"
+dependencies = [
+ "cosmwasm-schema",
+ "cosmwasm-std",
+]
+
+[[package]]
+name = "cw-incoming-proxy"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw-incoming-proxy-derive",
+ "cw-multi-test 0.20.0",
+ "cw-paginate-storage",
+ "cw-storage-plus 1.2.0",
+ "ics721",
+ "schemars",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
+name = "cw-incoming-proxy-derive"
+version = "0.0.1"
+dependencies = [
+ "cosmwasm-std",
+ "ics721",
+ "proc-macro2",
+ "quote",
+ "syn 1.0.109",
+]
+
+[[package]]
 name = "cw-multi-test"
 version = "0.15.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -286,6 +323,29 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "cw-paginate-storage"
+version = "2.4.0"
+source = "git+https://github.com/DA0-DA0/dao-contracts.git#3ead037e9366d922c862614974b16b4dc732b329"
+dependencies = [
+ "cosmwasm-std",
+ "cosmwasm-storage",
+ "cw-storage-plus 1.2.0",
+ "serde",
+]
+
+[[package]]
+name = "cw-pause-once"
+version = "0.1.0"
+source = "git+https://github.com/arkprotocol/ark-ics721?branch=incoming_proxy#e51034349d8ca0697c59880f1ded966899be0fc0"
+dependencies = [
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw-storage-plus 1.2.0",
+ "cw-utils 1.0.3",
+ "thiserror",
 ]
 
 [[package]]
@@ -495,6 +555,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "cw721-incoming-proxy"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw-incoming-proxy",
+ "cw-incoming-proxy-derive",
+ "cw-multi-test 0.20.0",
+ "cw-storage-plus 1.2.0",
+ "cw2 1.1.2",
+ "cw721 0.18.0",
+ "cw721-base 0.18.0",
+ "cw721-proxy",
+ "cw721-proxy-derive 0.0.1",
+ "cw721-proxy-tester",
+ "ics721",
+ "rand",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
 name = "cw721-proxy"
 version = "0.0.1"
 dependencies = [
@@ -502,13 +585,24 @@ dependencies = [
  "cosmwasm-std",
  "cw-storage-plus 1.2.0",
  "cw721 0.18.0",
- "cw721-proxy-derive",
+ "cw721-proxy-derive 0.0.1",
  "thiserror",
 ]
 
 [[package]]
 name = "cw721-proxy-derive"
 version = "0.0.1"
+dependencies = [
+ "cw721 0.18.0",
+ "proc-macro2",
+ "quote",
+ "syn 1.0.109",
+]
+
+[[package]]
+name = "cw721-proxy-derive"
+version = "0.0.1"
+source = "git+https://github.com/arkprotocol/cw721-proxy.git?tag=v0.0.7#a433953f4d4f605a7b472f9cb31b5068dcad3e28"
 dependencies = [
  "cw721 0.18.0",
  "proc-macro2",
@@ -527,7 +621,7 @@ dependencies = [
  "cw2 0.15.1",
  "cw721 0.15.0",
  "cw721-proxy",
- "cw721-proxy-derive",
+ "cw721-proxy-derive 0.0.1",
  "thiserror",
 ]
 
@@ -545,7 +639,7 @@ dependencies = [
  "cw721 0.18.0",
  "cw721-base 0.18.0",
  "cw721-proxy",
- "cw721-proxy-derive",
+ "cw721-proxy-derive 0.0.1",
  "cw721-proxy-tester",
  "rand",
  "serde",
@@ -725,6 +819,30 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6c49c37c09c17a53d937dfbb742eb3a961d65a994e6bcdcf37e7399d0cc8ab5e"
 dependencies = [
  "digest 0.10.7",
+]
+
+[[package]]
+name = "ics721"
+version = "0.1.0"
+source = "git+https://github.com/arkprotocol/ark-ics721?branch=incoming_proxy#e51034349d8ca0697c59880f1ded966899be0fc0"
+dependencies = [
+ "bech32",
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw-cii",
+ "cw-ownable",
+ "cw-paginate-storage",
+ "cw-pause-once",
+ "cw-storage-plus 1.2.0",
+ "cw-utils 1.0.3",
+ "cw721 0.18.0",
+ "cw721-base 0.16.0",
+ "cw721-base 0.18.0",
+ "cw721-proxy-derive 0.0.1 (git+https://github.com/arkprotocol/cw721-proxy.git?tag=v0.0.7)",
+ "serde",
+ "sha2 0.10.8",
+ "thiserror",
+ "zip-optional",
 ]
 
 [[package]]
@@ -1146,3 +1264,8 @@ name = "zeroize"
 version = "1.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "525b4ec142c6b68a2d10f01f7bbf6755599ca3f81ea53b8431b7dd348f5fdb2d"
+
+[[package]]
+name = "zip-optional"
+version = "0.1.0"
+source = "git+https://github.com/arkprotocol/ark-ics721?branch=incoming_proxy#e51034349d8ca0697c59880f1ded966899be0fc0"
