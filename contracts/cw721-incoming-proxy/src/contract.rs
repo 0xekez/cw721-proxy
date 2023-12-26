@@ -5,7 +5,6 @@ use cosmwasm_std::{to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Resp
 use cw2::set_contract_version;
 use cw_incoming_proxy::IncomingProxyQuery;
 use cw_incoming_proxy::{IncomingProxyError, IncomingProxyExecute};
-use serde::{de::DeserializeOwned, Serialize};
 
 use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
 
@@ -17,15 +16,12 @@ const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 pub struct IncomingProxyContract {}
 
 #[cfg_attr(not(feature = "library"), entry_point)]
-pub fn instantiate<T>(
+pub fn instantiate(
     deps: DepsMut,
     _env: Env,
     _info: MessageInfo,
     msg: InstantiateMsg,
-) -> StdResult<Response<T>>
-where
-    T: Serialize + DeserializeOwned + Clone,
-{
+) -> StdResult<Response> {
     set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
 
     IncomingProxyContract::default().initialize(
@@ -35,7 +31,7 @@ where
         msg.source_channels.clone(),
     )?;
 
-    Ok(Response::<T>::default()
+    Ok(Response::default()
         .add_attribute("method", "instantiate")
         .add_attribute(
             "orgin",
@@ -54,15 +50,12 @@ where
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
-pub fn execute<T>(
+pub fn execute(
     deps: DepsMut,
     _env: Env,
     info: MessageInfo,
     msg: ExecuteMsg,
-) -> Result<Response<T>, IncomingProxyError>
-where
-    T: Serialize + DeserializeOwned + Clone,
-{
+) -> Result<Response, IncomingProxyError> {
     match msg {
         ExecuteMsg::Ics721ReceivePacketMsg { data, packet } => IncomingProxyContract::default()
             .execute_ics721_receive_packet_msg(deps.storage, &info, packet, data),

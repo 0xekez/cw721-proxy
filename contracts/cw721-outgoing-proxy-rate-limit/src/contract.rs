@@ -5,7 +5,6 @@ use cosmwasm_std::{
 };
 use cw2::set_contract_version;
 use cw721_outgoing_proxy::ProxyExecuteMsg;
-use serde::{de::DeserializeOwned, Serialize};
 
 use cw_rate_limiter::{Rate, RateLimitError};
 
@@ -16,15 +15,12 @@ const CONTRACT_NAME: &str = "crates.io:cw721-outgoing-proxy-rate-limit";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[cfg_attr(not(feature = "library"), entry_point)]
-pub fn instantiate<T>(
+pub fn instantiate(
     deps: DepsMut,
     _env: Env,
     info: MessageInfo,
     msg: InstantiateMsg,
-) -> Result<Response<T>, RateLimitError>
-where
-    T: Serialize + DeserializeOwned + Clone,
-{
+) -> Result<Response, RateLimitError> {
     set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
     ORIGIN.save(
         deps.storage,
@@ -38,36 +34,30 @@ where
         Rate::Blocks(rate) => (rate, "blocks_per_nft"),
     };
     RATE_LIMIT.init(deps.storage, &msg.rate_limit)?;
-    Ok(Response::<T>::default()
+    Ok(Response::default()
         .add_attribute("method", "instantiate")
         .add_attribute("rate", rate.to_string())
         .add_attribute("units", units))
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
-pub fn execute<T>(
+pub fn execute(
     deps: DepsMut,
     env: Env,
     info: MessageInfo,
     msg: ExecuteMsg,
-) -> Result<Response<T>, RateLimitError>
-where
-    T: Serialize + DeserializeOwned + Clone,
-{
+) -> Result<Response, RateLimitError> {
     match msg {
-        ExecuteMsg::ReceiveNft(msg) => execute_receive_nft::<T>(deps, env, info, msg),
+        ExecuteMsg::ReceiveNft(msg) => execute_receive_nft(deps, env, info, msg),
     }
 }
 
-pub fn execute_receive_nft<T>(
+pub fn execute_receive_nft(
     deps: DepsMut,
     env: Env,
     info: MessageInfo,
     msg: cw721::Cw721ReceiveMsg,
-) -> Result<Response<T>, RateLimitError>
-where
-    T: Serialize + DeserializeOwned + Clone,
-{
+) -> Result<Response, RateLimitError> {
     RATE_LIMIT.limit(deps.storage, &env.block, info.sender.as_str())?;
     Ok(Response::default().add_message(WasmMsg::Execute {
         contract_addr: ORIGIN.load(deps.storage)?.into_string(),
