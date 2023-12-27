@@ -6,7 +6,7 @@ use cosmwasm_std::{
 use cw_incoming_proxy::{IncomingProxyError, IncomingProxyExecute, IncomingProxyQuery};
 use cw_incoming_proxy_derive::{cw_incoming_proxy_execute, cw_incoming_proxy_query};
 use cw_multi_test::{App, AppResponse, Contract, ContractWrapper, Executor};
-use ics721::{ibc::NonFungibleTokenPacketData, token_types::ClassId};
+use ics721_types::{ibc::NonFungibleTokenPacketData, token_types::ClassId};
 use serde::{de::DeserializeOwned, Serialize};
 use thiserror::Error;
 
@@ -221,7 +221,7 @@ impl Ics721IncomingProxyMultiTest {
         &mut self,
         sender: Addr,
         packet: cosmwasm_std::IbcPacket,
-        data: ics721::ibc::NonFungibleTokenPacketData,
+        data: ics721_types::ibc::NonFungibleTokenPacketData,
         send_funds: &[Coin],
     ) -> Result<AppResponse, anyhow::Error> {
         self.execute_contract(

@@ -224,51 +224,17 @@ dependencies = [
 ]
 
 [[package]]
-name = "cw-cii"
-version = "0.1.0"
-source = "git+https://github.com/arkprotocol/ark-cw-ics721?branch=incoming_proxy#ef714afd3f3f43d0e724e2f7fd1499921e55d20e"
-dependencies = [
- "cosmwasm-schema",
- "cosmwasm-std",
-]
-
-[[package]]
-name = "cw-cii"
-version = "0.1.0"
-source = "git+https://github.com/arkprotocol/ark-ics721?branch=incoming_proxy#e51034349d8ca0697c59880f1ded966899be0fc0"
-dependencies = [
- "cosmwasm-schema",
- "cosmwasm-std",
-]
-
-[[package]]
 name = "cw-incoming-proxy"
 version = "0.0.1"
 dependencies = [
  "anyhow",
  "cosmwasm-schema",
  "cosmwasm-std",
- "cw-incoming-proxy-derive 0.0.1",
+ "cw-incoming-proxy-derive",
  "cw-multi-test",
  "cw-paginate-storage",
  "cw-storage-plus 1.2.0",
- "ics721 0.1.0 (git+https://github.com/arkprotocol/ark-cw-ics721?branch=incoming_proxy)",
- "schemars",
- "serde",
- "thiserror",
-]
-
-[[package]]
-name = "cw-incoming-proxy"
-version = "0.0.1"
-source = "git+https://github.com/arkprotocol/cw721-proxy.git#9a521ac6d95dadc10455fac60f70d8613c3956b0"
-dependencies = [
- "cosmwasm-schema",
- "cosmwasm-std",
- "cw-incoming-proxy-derive 0.0.1 (git+https://github.com/arkprotocol/cw721-proxy.git)",
- "cw-paginate-storage",
- "cw-storage-plus 1.2.0",
- "ics721 0.1.0 (git+https://github.com/arkprotocol/ark-ics721?branch=incoming_proxy)",
+ "ics721-types",
  "schemars",
  "serde",
  "thiserror",
@@ -279,19 +245,7 @@ name = "cw-incoming-proxy-derive"
 version = "0.0.1"
 dependencies = [
  "cosmwasm-std",
- "ics721 0.1.0 (git+https://github.com/arkprotocol/ark-cw-ics721?branch=incoming_proxy)",
- "proc-macro2",
- "quote",
- "syn 1.0.109",
-]
-
-[[package]]
-name = "cw-incoming-proxy-derive"
-version = "0.0.1"
-source = "git+https://github.com/arkprotocol/cw721-proxy.git#9a521ac6d95dadc10455fac60f70d8613c3956b0"
-dependencies = [
- "cosmwasm-std",
- "ics721 0.1.0 (git+https://github.com/arkprotocol/ark-ics721?branch=incoming_proxy)",
+ "ics721-types",
  "proc-macro2",
  "quote",
  "syn 1.0.109",
@@ -352,30 +306,6 @@ dependencies = [
  "cosmwasm-storage",
  "cw-storage-plus 1.2.0",
  "serde",
-]
-
-[[package]]
-name = "cw-pause-once"
-version = "0.1.0"
-source = "git+https://github.com/arkprotocol/ark-cw-ics721?branch=incoming_proxy#ef714afd3f3f43d0e724e2f7fd1499921e55d20e"
-dependencies = [
- "cosmwasm-schema",
- "cosmwasm-std",
- "cw-storage-plus 1.2.0",
- "cw-utils 1.0.3",
- "thiserror",
-]
-
-[[package]]
-name = "cw-pause-once"
-version = "0.1.0"
-source = "git+https://github.com/arkprotocol/ark-ics721?branch=incoming_proxy#e51034349d8ca0697c59880f1ded966899be0fc0"
-dependencies = [
- "cosmwasm-schema",
- "cosmwasm-std",
- "cw-storage-plus 1.2.0",
- "cw-utils 1.0.3",
- "thiserror",
 ]
 
 [[package]]
@@ -539,42 +469,23 @@ dependencies = [
  "anyhow",
  "cosmwasm-schema",
  "cosmwasm-std",
- "cw-incoming-proxy 0.0.1",
- "cw-incoming-proxy-derive 0.0.1",
+ "cw-incoming-proxy",
+ "cw-incoming-proxy-derive",
  "cw-multi-test",
  "cw-storage-plus 1.2.0",
  "cw2 1.1.2",
  "cw721 0.18.0",
  "cw721-base 0.18.0",
- "cw721-outgoing-proxy 0.0.1",
- "cw721-outgoing-proxy-derive 0.0.1",
+ "cw721-outgoing-proxy",
+ "cw721-outgoing-proxy-derive",
  "cw721-outgoing-proxy-tester",
- "ics721 0.1.0 (git+https://github.com/arkprotocol/ark-cw-ics721?branch=incoming_proxy)",
+ "ics721-types",
  "rand",
  "serde",
  "thiserror",
 ]
 
 [[package]]
-name = "cw721-incoming-proxy"
-version = "0.0.1"
-source = "git+https://github.com/arkprotocol/cw721-proxy.git#9a521ac6d95dadc10455fac60f70d8613c3956b0"
-dependencies = [
- "cosmwasm-schema",
- "cosmwasm-std",
- "cw-incoming-proxy 0.0.1 (git+https://github.com/arkprotocol/cw721-proxy.git)",
- "cw-incoming-proxy-derive 0.0.1 (git+https://github.com/arkprotocol/cw721-proxy.git)",
- "cw-storage-plus 1.2.0",
- "cw2 1.1.2",
- "cw721 0.18.0",
- "cw721-outgoing-proxy 0.0.1 (git+https://github.com/arkprotocol/cw721-proxy.git)",
- "cw721-outgoing-proxy-derive 0.0.1 (git+https://github.com/arkprotocol/cw721-proxy.git)",
- "ics721 0.1.0 (git+https://github.com/arkprotocol/ark-ics721?branch=incoming_proxy)",
- "serde",
- "thiserror",
-]
-
-[[package]]
 name = "cw721-outgoing-proxy"
 version = "0.0.1"
 dependencies = [
@@ -582,37 +493,13 @@ dependencies = [
  "cosmwasm-std",
  "cw-storage-plus 1.2.0",
  "cw721 0.18.0",
- "cw721-outgoing-proxy-derive 0.0.1",
- "thiserror",
-]
-
-[[package]]
-name = "cw721-outgoing-proxy"
-version = "0.0.1"
-source = "git+https://github.com/arkprotocol/cw721-proxy.git#9a521ac6d95dadc10455fac60f70d8613c3956b0"
-dependencies = [
- "cosmwasm-schema",
- "cosmwasm-std",
- "cw-storage-plus 1.2.0",
- "cw721 0.18.0",
- "cw721-outgoing-proxy-derive 0.0.1 (git+https://github.com/arkprotocol/cw721-proxy.git)",
+ "cw721-outgoing-proxy-derive",
  "thiserror",
 ]
 
 [[package]]
 name = "cw721-outgoing-proxy-derive"
 version = "0.0.1"
-dependencies = [
- "cw721 0.18.0",
- "proc-macro2",
- "quote",
- "syn 1.0.109",
-]
-
-[[package]]
-name = "cw721-outgoing-proxy-derive"
-version = "0.0.1"
-source = "git+https://github.com/arkprotocol/cw721-proxy.git#9a521ac6d95dadc10455fac60f70d8613c3956b0"
 dependencies = [
  "cw721 0.18.0",
  "proc-macro2",
@@ -633,8 +520,8 @@ dependencies = [
  "cw2 1.1.2",
  "cw721 0.18.0",
  "cw721-base 0.18.0",
- "cw721-outgoing-proxy 0.0.1",
- "cw721-outgoing-proxy-derive 0.0.1",
+ "cw721-outgoing-proxy",
+ "cw721-outgoing-proxy-derive",
  "cw721-outgoing-proxy-tester",
  "rand",
  "serde",
@@ -651,20 +538,9 @@ dependencies = [
  "cw-storage-plus 1.2.0",
  "cw2 1.1.2",
  "cw721 0.18.0",
- "cw721-outgoing-proxy 0.0.1",
- "cw721-outgoing-proxy-derive 0.0.1",
+ "cw721-outgoing-proxy",
+ "cw721-outgoing-proxy-derive",
  "thiserror",
-]
-
-[[package]]
-name = "cw721-proxy-derive"
-version = "0.0.1"
-source = "git+https://github.com/arkprotocol/cw721-proxy.git?tag=v0.0.7#a433953f4d4f605a7b472f9cb31b5068dcad3e28"
-dependencies = [
- "cw721 0.18.0",
- "proc-macro2",
- "quote",
- "syn 1.0.109",
 ]
 
 [[package]]
@@ -843,52 +719,15 @@ dependencies = [
 ]
 
 [[package]]
-name = "ics721"
+name = "ics721-types"
 version = "0.1.0"
-source = "git+https://github.com/arkprotocol/ark-cw-ics721?branch=incoming_proxy#ef714afd3f3f43d0e724e2f7fd1499921e55d20e"
+source = "git+https://github.com/arkprotocol/ark-cw-ics721?branch=incoming_proxy#4e2e5e3619d5b2c940e07c58df85306490ce393b"
 dependencies = [
- "bech32",
  "cosmwasm-schema",
  "cosmwasm-std",
- "cw-cii 0.1.0 (git+https://github.com/arkprotocol/ark-cw-ics721?branch=incoming_proxy)",
- "cw-ownable",
- "cw-paginate-storage",
- "cw-pause-once 0.1.0 (git+https://github.com/arkprotocol/ark-cw-ics721?branch=incoming_proxy)",
  "cw-storage-plus 1.2.0",
- "cw-utils 1.0.3",
- "cw721 0.18.0",
- "cw721-base 0.16.0",
- "cw721-base 0.18.0",
- "cw721-incoming-proxy 0.0.1 (git+https://github.com/arkprotocol/cw721-proxy.git)",
- "cw721-outgoing-proxy-derive 0.0.1 (git+https://github.com/arkprotocol/cw721-proxy.git)",
  "serde",
- "sha2 0.10.8",
  "thiserror",
- "zip-optional 0.1.0 (git+https://github.com/arkprotocol/ark-cw-ics721?branch=incoming_proxy)",
-]
-
-[[package]]
-name = "ics721"
-version = "0.1.0"
-source = "git+https://github.com/arkprotocol/ark-ics721?branch=incoming_proxy#e51034349d8ca0697c59880f1ded966899be0fc0"
-dependencies = [
- "bech32",
- "cosmwasm-schema",
- "cosmwasm-std",
- "cw-cii 0.1.0 (git+https://github.com/arkprotocol/ark-ics721?branch=incoming_proxy)",
- "cw-ownable",
- "cw-paginate-storage",
- "cw-pause-once 0.1.0 (git+https://github.com/arkprotocol/ark-ics721?branch=incoming_proxy)",
- "cw-storage-plus 1.2.0",
- "cw-utils 1.0.3",
- "cw721 0.18.0",
- "cw721-base 0.16.0",
- "cw721-base 0.18.0",
- "cw721-proxy-derive",
- "serde",
- "sha2 0.10.8",
- "thiserror",
- "zip-optional 0.1.0 (git+https://github.com/arkprotocol/ark-ics721?branch=incoming_proxy)",
 ]
 
 [[package]]
@@ -1278,13 +1117,3 @@ name = "zeroize"
 version = "1.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "525b4ec142c6b68a2d10f01f7bbf6755599ca3f81ea53b8431b7dd348f5fdb2d"
-
-[[package]]
-name = "zip-optional"
-version = "0.1.0"
-source = "git+https://github.com/arkprotocol/ark-cw-ics721?branch=incoming_proxy#ef714afd3f3f43d0e724e2f7fd1499921e55d20e"
-
-[[package]]
-name = "zip-optional"
-version = "0.1.0"
-source = "git+https://github.com/arkprotocol/ark-ics721?branch=incoming_proxy#e51034349d8ca0697c59880f1ded966899be0fc0"

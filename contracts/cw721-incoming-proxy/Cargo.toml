@@ -23,7 +23,7 @@ cw721-outgoing-proxy = { workspace = true }
 cw721-outgoing-proxy-derive = { workspace = true }
 cw-incoming-proxy  = { workspace = true }
 cw-incoming-proxy-derive  = { workspace = true }
-ics721 = { workspace = true }
+ics721-types = { workspace = true }
 serde = { workspace = true }
 thiserror = { workspace = true }
 

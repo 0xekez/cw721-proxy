@@ -88,7 +88,7 @@ pub fn cw_incoming_proxy_execute(metadata: TokenStream, input: TokenStream) -> T
             enum Right {
                 Ics721ReceivePacketMsg {
                     packet: cosmwasm_std::IbcPacket,
-                    data: ics721::ibc::NonFungibleTokenPacketData,
+                    data: ics721_types::ibc::NonFungibleTokenPacketData,
                 },
             }
         }

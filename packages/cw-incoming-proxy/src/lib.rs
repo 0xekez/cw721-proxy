@@ -1,6 +1,6 @@
 use cw_paginate_storage::paginate_map_keys;
 use cw_storage_plus::{Item, Map};
-use ics721::ibc::NonFungibleTokenPacketData;
+use ics721_types::ibc::NonFungibleTokenPacketData;
 
 use cosmwasm_std::{
     Addr, Api, Deps, IbcPacket, MessageInfo, Order, Response, StdError, StdResult, Storage,

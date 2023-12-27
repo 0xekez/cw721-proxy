@@ -25,7 +25,7 @@ cw721-outgoing-proxy-tester = { path = "./debug/cw721-outgoing-proxy-tester", ve
 cw-rate-limiter = { path = "./packages/cw-rate-limiter", version = "*" }
 cw-incoming-proxy = { path = "./packages/cw-incoming-proxy", version = "*" }
 cw-incoming-proxy-derive = { path = "./packages/cw-incoming-proxy/derive", version = "*" }
-ics721 = { git = "https://github.com/arkprotocol/ark-cw-ics721", branch = "incoming_proxy", version = "*" } # TODO change to tag once merged to PA repo
+ics721-types = { git = "https://github.com/arkprotocol/ark-cw-ics721", branch = "incoming_proxy", version = "*" } # TODO change to tag once merged to PA repo
 
 quote = "^1.0"
 rand = "^0.8"
