@@ -20,7 +20,7 @@ cosmwasm-schema = { workspace = true }
 cw-storage-plus = { workspace = true }
 cw2 = { workspace = true }
 cw721 = { workspace = true }
-cw721-base = { workspace = true }
+cw721-base = { workspace = true, features = [ "library" ] }
 cw721-outgoing-proxy = { workspace = true }
 cw721-outgoing-proxy-derive = { workspace = true }
 cw-rate-limiter = { workspace = true }
@@ -30,7 +30,6 @@ thiserror = { workspace = true }
 
 [dev-dependencies]
 cw-multi-test = { workspace = true }
-cw721-base = { workspace = true }
 cw721-outgoing-proxy-tester = { workspace = true }
 rand = { workspace = true }
 anyhow = { workspace = true }
