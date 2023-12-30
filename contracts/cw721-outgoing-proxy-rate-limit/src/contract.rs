@@ -4,7 +4,8 @@ use cosmwasm_std::{
     to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, WasmMsg,
 };
 use cw2::set_contract_version;
-use cw721_outgoing_proxy::ProxyExecuteMsg;
+use cw721::Cw721ReceiveMsg;
+use ics721_types::ibc_types::IbcOutgoingProxyMsg;
 
 use cw_rate_limiter::{Rate, RateLimitError};
 
@@ -56,15 +57,25 @@ pub fn execute_receive_nft(
     deps: DepsMut,
     env: Env,
     info: MessageInfo,
-    msg: cw721::Cw721ReceiveMsg,
+    msg: Cw721ReceiveMsg,
 ) -> Result<Response, RateLimitError> {
     RATE_LIMIT.limit(deps.storage, &env.block, info.sender.as_str())?;
+    let Cw721ReceiveMsg {
+        sender,
+        token_id,
+        msg,
+    } = msg;
+    let msg = IbcOutgoingProxyMsg {
+        collection: info.sender.into_string(),
+        msg,
+    };
     Ok(Response::default().add_message(WasmMsg::Execute {
         contract_addr: ORIGIN.load(deps.storage)?.into_string(),
-        msg: to_json_binary(&ProxyExecuteMsg::ReceiveProxyNft {
-            eyeball: info.sender.into_string(),
-            msg,
-        })?,
+        msg: to_json_binary(&ExecuteMsg::ReceiveNft(Cw721ReceiveMsg {
+            sender,
+            token_id,
+            msg: to_json_binary(&msg)?,
+        }))?,
         funds: vec![],
     }))
 }

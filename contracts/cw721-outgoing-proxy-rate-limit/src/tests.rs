@@ -1,6 +1,8 @@
-use cosmwasm_std::{to_json_binary, Addr, Empty};
+use cosmwasm_std::{from_json, to_json_binary, Addr, Empty};
+use cw721::Cw721ReceiveMsg;
 use cw_multi_test::{next_block, App, Contract, ContractWrapper, Executor};
 use cw_rate_limiter::{Rate, RateLimitError};
+use ics721_types::ibc_types::IbcOutgoingProxyMsg;
 
 use crate::msg::{InstantiateMsg, QueryMsg};
 
@@ -120,13 +122,19 @@ impl Test {
         )?;
 
         match msg {
-            cw721_outgoing_proxy_tester::msg::ExecuteMsg::ReceiveProxyNft { eyeball, msg } => {
-                assert_eq!(eyeball, nft);
+            cw721_outgoing_proxy_tester::msg::ExecuteMsg::ReceiveNft(msg) => {
+                let Cw721ReceiveMsg {
+                    sender,
+                    token_id,
+                    msg,
+                } = msg;
+                let msg: IbcOutgoingProxyMsg = from_json(msg)?;
+                assert_eq!(sender, self.minter.to_string());
+                assert_eq!(token_id, self.nfts_minted.to_string());
                 assert_eq!(
                     msg,
-                    cw721::Cw721ReceiveMsg {
-                        sender: self.minter.to_string(),
-                        token_id: self.nfts_minted.to_string(),
+                    IbcOutgoingProxyMsg {
+                        collection: nft.to_string(),
                         msg: to_json_binary("hello")?
                     }
                 )

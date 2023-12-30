@@ -3,15 +3,15 @@ use quote::quote;
 use syn::{parse_macro_input, AttributeArgs, DataEnum, DeriveInput, Variant};
 
 /// Adds the nesecary fields to a enum such that it implements the
-/// cw721-outgoing-proxy-receiver interface. You must have the cw721 Cargo
+/// cw721 ReceiveNft interface. You must have the cw721 Cargo
 /// package avaliable as a dependency to use this macro.
 ///
 /// For example:
 ///
 /// ```
-/// use cw721_outgoing_proxy_derive::cw721_outgoing_proxy;
+/// use cw721_outgoing_proxy_derive::cw721_receive_nft;
 ///
-/// #[cw721_outgoing_proxy]
+/// #[cw721_receive_nft]
 /// enum ExecuteMsg {}
 /// ```
 ///
@@ -19,10 +19,7 @@ use syn::{parse_macro_input, AttributeArgs, DataEnum, DeriveInput, Variant};
 ///
 /// ```
 /// enum ExecuteMsg {
-///     ReceiveProxyNft {
-///         eyeball: String,
-///         msg: cw721::Cw721ReceiveMsg,
-///     }
+///     ReceiveNft(cw721::Cw721ReceiveMsg)
 /// }
 /// ```
 ///
@@ -32,10 +29,10 @@ use syn::{parse_macro_input, AttributeArgs, DataEnum, DeriveInput, Variant};
 /// occurs before the addition of the field.
 ///
 /// ```compile_fail
-/// use cw721_outgoing_proxy_derive::cw721_outgoing_proxy;
+/// use cw721_outgoing_proxy_derive::cw721_receive_nft;
 ///
 /// #[derive(Clone)]
-/// #[cw721_outgoing_proxy]
+/// #[cw721_receive_nft]
 /// #[allow(dead_code)]
 /// enum Test {
 ///     Foo,
@@ -44,7 +41,7 @@ use syn::{parse_macro_input, AttributeArgs, DataEnum, DeriveInput, Variant};
 /// }
 /// ```
 #[proc_macro_attribute]
-pub fn cw721_outgoing_proxy(metadata: TokenStream, input: TokenStream) -> TokenStream {
+pub fn cw721_receive_nft(metadata: TokenStream, input: TokenStream) -> TokenStream {
     // Make sure that no arguments were passed in.
     let args = parse_macro_input!(metadata as AttributeArgs);
     if let Some(first_arg) = args.first() {
@@ -57,10 +54,7 @@ pub fn cw721_outgoing_proxy(metadata: TokenStream, input: TokenStream) -> TokenS
     match &mut ast.data {
         syn::Data::Enum(DataEnum { variants, .. }) => {
             let receive: Variant = syn::parse2(quote! {
-                ReceiveProxyNft {
-                    eyeball: String,
-                    msg: ::cw721::Cw721ReceiveMsg,
-                }
+                ReceiveNft (::cw721::Cw721ReceiveMsg)
             })
             .unwrap();
 

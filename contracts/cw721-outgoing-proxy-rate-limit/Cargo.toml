@@ -23,6 +23,7 @@ cw721 = { workspace = true }
 cw721-outgoing-proxy = { workspace = true }
 cw721-outgoing-proxy-derive = { workspace = true }
 cw-rate-limiter = { workspace = true }
+ics721-types = { workspace = true }
 serde = { workspace = true }
 thiserror = { workspace = true }
 

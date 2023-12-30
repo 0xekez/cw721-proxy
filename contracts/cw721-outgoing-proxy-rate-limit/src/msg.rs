@@ -1,5 +1,6 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
 
+use cw721_outgoing_proxy_derive::cw721_receive_nft;
 use cw_rate_limiter::Rate;
 
 #[cw_serde]
@@ -8,10 +9,9 @@ pub struct InstantiateMsg {
     pub origin: Option<String>,
 }
 
+#[cw721_receive_nft]
 #[cw_serde]
-pub enum ExecuteMsg {
-    ReceiveNft(cw721::Cw721ReceiveMsg),
-}
+pub enum ExecuteMsg {}
 
 #[cw_serde]
 #[derive(QueryResponses)]
