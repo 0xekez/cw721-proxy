@@ -182,7 +182,8 @@ fn cw721_rate_limiter() -> Box<dyn Contract<Empty>> {
         crate::contract::execute,
         crate::contract::instantiate,
         crate::contract::query,
-    );
+    )
+    .with_reply(crate::contract::reply);
     Box::new(contract)
 }
 
