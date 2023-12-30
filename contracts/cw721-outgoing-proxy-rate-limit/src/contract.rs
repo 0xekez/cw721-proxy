@@ -79,7 +79,7 @@ pub fn execute_receive_nft(
     let transfer_msg = WasmMsg::Execute {
         contract_addr: info.sender.to_string(), // collection contract
         msg: to_json_binary(&Cw721ExecuteMsg::<Empty, Empty>::TransferNft {
-            recipient: env.contract.address.to_string(),
+            recipient: ORIGIN.load(deps.storage)?.into_string(), // ics721
             token_id: token_id.clone(),
         })?,
         funds: vec![],
