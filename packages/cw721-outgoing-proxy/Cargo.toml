@@ -11,6 +11,8 @@ cosmwasm-schema = { workspace = true }
 
 cw-storage-plus = { workspace = true }
 cw721 = { workspace = true }
+cw721-base = { workspace = true }
+ics721-types = { workspace = true }
 
 thiserror = { workspace = true }
 
