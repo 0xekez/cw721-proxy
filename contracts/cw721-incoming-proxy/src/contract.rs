@@ -6,7 +6,7 @@ use cw2::set_contract_version;
 use cw_incoming_proxy::IncomingProxyQuery;
 use cw_incoming_proxy::{IncomingProxyError, IncomingProxyExecute};
 
-use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
+use crate::msg::{ExecuteMsg, InstantiateMsg, MigrateMsg, QueryMsg};
 
 const CONTRACT_NAME: &str = "crates.io:cw721-incoming-proxy";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -70,6 +70,21 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
         }
         QueryMsg::GetSourceChannels { start_after, limit } => to_json_binary(
             &IncomingProxyContract::default().get_source_channels(deps, start_after, limit)?,
+        ),
+    }
+}
+
+#[cfg_attr(not(feature = "library"), entry_point)]
+pub fn migrate(deps: DepsMut, _env: Env, msg: MigrateMsg) -> StdResult<Response> {
+    match msg {
+        MigrateMsg::WithUpdate {
+            origin,
+            source_channels,
+        } => IncomingProxyContract::default().migrate(
+            deps.storage,
+            deps.api,
+            origin,
+            source_channels,
         ),
     }
 }

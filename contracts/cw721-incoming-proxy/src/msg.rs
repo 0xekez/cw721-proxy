@@ -16,3 +16,11 @@ pub enum ExecuteMsg {}
 #[cw_serde]
 #[derive(QueryResponses)]
 pub enum QueryMsg {}
+
+#[cw_serde]
+pub enum MigrateMsg {
+    WithUpdate {
+        origin: Option<String>,
+        source_channels: Option<Vec<String>>,
+    },
+}

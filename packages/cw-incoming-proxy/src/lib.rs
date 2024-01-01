@@ -80,6 +80,31 @@ pub trait IncomingProxyExecute {
             packet.src.channel_id,
         ))
     }
+
+    fn migrate(
+        &mut self,
+        storage: &mut dyn Storage,
+        api: &dyn Api,
+        origin: Option<String>,
+        source_channels: Option<Vec<String>>,
+    ) -> StdResult<Response> {
+        if let Some(origin) = origin.clone() {
+            ORIGIN.save(storage, &api.addr_validate(&origin)?)?;
+        }
+        if let Some(source_channels) = source_channels.clone() {
+            SOURCE_CHANNELS.clear(storage);
+            for source_channel in source_channels {
+                SOURCE_CHANNELS.save(storage, source_channel.clone(), &source_channel)?;
+            }
+        }
+        Ok(Response::default()
+            .add_attribute("method", "migrate")
+            .add_attribute("origin", origin.unwrap_or("empty".to_string()))
+            .add_attribute(
+                "source_channels",
+                source_channels.unwrap_or_default().join(","),
+            ))
+    }
 }
 
 pub trait IncomingProxyQuery {
