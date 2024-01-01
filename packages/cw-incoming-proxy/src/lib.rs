@@ -73,7 +73,7 @@ pub trait IncomingProxyExecute {
         storage: &dyn Storage,
         packet: IbcPacket,
     ) -> Result<(), IncomingProxyError> {
-        if SOURCE_CHANNELS.has(storage, packet.src.channel_id.clone()) {
+        if SOURCE_CHANNELS.has(storage, packet.dest.channel_id.clone()) {
             return Ok(());
         }
         Err(IncomingProxyError::UnauthorizedSourceChannel(
