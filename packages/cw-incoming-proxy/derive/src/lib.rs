@@ -126,7 +126,7 @@ pub fn cw_incoming_proxy_execute(metadata: TokenStream, input: TokenStream) -> T
 ///     #[returns(Option<Addr>)]
 ///     GetOrigin {},
 ///     #[returns(Vec<String>)]
-///     GetSourceChannels {},
+///     GetChannels {},
 ///     #[returns(FooResponse)]
 ///     Foo {},
 ///     #[returns(BarResponse)]
@@ -147,7 +147,7 @@ pub fn cw_incoming_proxy_query(metadata: TokenStream, input: TokenStream) -> Tok
                 #[returns(cosmwasm_std::Addr)]
                 GetOrigin {},
                 #[returns(Vec<String>)]
-                GetSourceChannels {
+                GetChannels {
                     start_after: Option<String>,
                     limit: Option<u32>,
                 },

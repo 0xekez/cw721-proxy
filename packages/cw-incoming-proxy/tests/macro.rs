@@ -39,7 +39,7 @@ fn derive_query_variants() {
     // If this compiles we have won.
     match msg {
         QueryMsg::GetOrigin {}
-        | QueryMsg::GetSourceChannels { .. }
+        | QueryMsg::GetChannels { .. }
         | QueryMsg::Foo
         | QueryMsg::Bar(_)
         | QueryMsg::Fuzz { .. } => "yay",

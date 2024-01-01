@@ -5,7 +5,7 @@ use cw_incoming_proxy_derive::{cw_incoming_proxy_execute, cw_incoming_proxy_quer
 #[cw_serde]
 pub struct InstantiateMsg {
     pub origin: Option<String>,
-    pub source_channels: Option<Vec<String>>,
+    pub channels: Option<Vec<String>>,
 }
 
 #[cw_incoming_proxy_execute]
@@ -21,6 +21,6 @@ pub enum QueryMsg {}
 pub enum MigrateMsg {
     WithUpdate {
         origin: Option<String>,
-        source_channels: Option<Vec<String>>,
+        channels: Option<Vec<String>>,
     },
 }

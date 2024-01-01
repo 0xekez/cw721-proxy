@@ -18,7 +18,7 @@ pub const CHANNEL_1: &str = "channel_1";
 #[cw_serde]
 pub struct MockInstantiateMsg {
     origin: Option<String>,
-    source_channels: Option<Vec<String>>,
+    channels: Option<Vec<String>>,
 }
 
 #[cw_incoming_proxy_execute]
@@ -34,7 +34,7 @@ pub enum MockQueryMsg {}
 pub enum MockMigrateMsg {
     WithUpdate {
         ics721: Option<String>,
-        source_channels: Option<Vec<String>>,
+        channels: Option<Vec<String>>,
     },
 }
 
@@ -71,7 +71,7 @@ pub mod entry {
             deps.storage,
             deps.api,
             msg.origin,
-            msg.source_channels,
+            msg.channels,
         )?;
         Ok(Response::default())
     }
@@ -102,23 +102,20 @@ pub mod entry {
             MockQueryMsg::GetOrigin {} => {
                 to_json_binary(&IncomingProxyContract::default().get_origin(deps.storage)?)
             }
-            MockQueryMsg::GetSourceChannels { limit, start_after } => to_json_binary(
-                &IncomingProxyContract::default().get_source_channels(deps, start_after, limit)?,
+            MockQueryMsg::GetChannels { limit, start_after } => to_json_binary(
+                &IncomingProxyContract::default().get_channels(deps, start_after, limit)?,
             ),
         }
     }
 
     pub fn migrate(deps: DepsMut, _env: Env, msg: MockMigrateMsg) -> StdResult<Response> {
         match msg {
-            MockMigrateMsg::WithUpdate {
-                ics721,
-                source_channels,
-            } => {
+            MockMigrateMsg::WithUpdate { ics721, channels } => {
                 IncomingProxyContract::default().initialize(
                     deps.storage,
                     deps.api,
                     ics721,
-                    source_channels,
+                    channels,
                 )?;
                 Ok(Response::default())
             }
@@ -137,13 +134,13 @@ pub struct Ics721IncomingProxyMultiTest {
     pub sender: Addr,
     pub other: Addr,
     pub origin: Addr,
-    pub source_channels: Option<Vec<String>>,
+    pub channels: Option<Vec<String>>,
     pub code_id: u64,
     pub contract: Addr,
 }
 
 impl Ics721IncomingProxyMultiTest {
-    pub fn new(origin: String, source_channels: Option<Vec<String>>) -> Self {
+    pub fn new(origin: String, channels: Option<Vec<String>>) -> Self {
         let sender = Addr::unchecked(SENDER_ADDR);
         let other = Addr::unchecked(OTHER_ADDR);
         let mut app = App::new(|router, _, storage| {
@@ -162,7 +159,7 @@ impl Ics721IncomingProxyMultiTest {
                 code_id,
                 sender.clone(),
                 &MockInstantiateMsg {
-                    source_channels: source_channels.clone(),
+                    channels: channels.clone(),
                     origin: Some(origin.clone()),
                 },
                 &[],
@@ -176,7 +173,7 @@ impl Ics721IncomingProxyMultiTest {
             sender,
             other,
             origin: Addr::unchecked(origin),
-            source_channels,
+            channels,
             code_id,
             contract,
         }
@@ -190,11 +187,11 @@ impl Ics721IncomingProxyMultiTest {
         self.app.wrap().query_wasm_smart(contract_addr, msg)
     }
 
-    fn query_source_channels(&self) -> StdResult<Vec<String>> {
+    fn query_channels(&self) -> StdResult<Vec<String>> {
         // in case proxy passed message to origin
         self.query_wasm_smart(
             &self.contract,
-            &MockQueryMsg::GetSourceChannels {
+            &MockQueryMsg::GetChannels {
                 start_after: None,
                 limit: None,
             },
@@ -235,22 +232,20 @@ impl Ics721IncomingProxyMultiTest {
 
 #[test]
 fn test_instantiate() {
-    // no source channels defined
+    // no channels defined
     {
         let test = Ics721IncomingProxyMultiTest::new(ORIGIN_ADDR.to_string(), None);
         let origin = test.query_origin().unwrap();
         assert_eq!(origin, Addr::unchecked(ORIGIN_ADDR));
     }
 
-    // source channels defined
+    // channels defined
     {
-        let source_channels = vec!["channel-0".to_string(), "channel-1".to_string()];
-        let test = Ics721IncomingProxyMultiTest::new(
-            ORIGIN_ADDR.to_string(),
-            Some(source_channels.clone()),
-        );
-        let source_channels = test.query_source_channels().unwrap();
-        assert_eq!(source_channels, source_channels);
+        let channels = vec!["channel-0".to_string(), "channel-1".to_string()];
+        let test =
+            Ics721IncomingProxyMultiTest::new(ORIGIN_ADDR.to_string(), Some(channels.clone()));
+        let channels = test.query_channels().unwrap();
+        assert_eq!(channels, channels);
     }
 }
 
@@ -316,8 +311,8 @@ fn test_ics721_receive_packet() {
 
         assert_eq!(
             error,
-            MockContractError::IncomingProxyError(IncomingProxyError::UnauthorizedSourceChannel(
-                "channel-0".to_string()
+            MockContractError::IncomingProxyError(IncomingProxyError::UnauthorizedChannel(
+                "channel-1".to_string()
             ))
         );
     }

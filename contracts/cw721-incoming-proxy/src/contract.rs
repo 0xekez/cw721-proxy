@@ -28,7 +28,7 @@ pub fn instantiate(
         deps.storage,
         deps.api,
         msg.origin.clone(),
-        msg.source_channels.clone(),
+        msg.channels.clone(),
     )?;
 
     Ok(Response::default()
@@ -38,8 +38,8 @@ pub fn instantiate(
             msg.origin.map_or("empty".to_string(), |o| o.to_string()),
         )
         .add_attribute(
-            "source_channels",
-            msg.source_channels.map_or("epmty".to_string(), |sc| {
+            "channels",
+            msg.channels.map_or("epmty".to_string(), |sc| {
                 if sc.is_empty() {
                     "empty".to_string()
                 } else {
@@ -68,8 +68,8 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
         QueryMsg::GetOrigin {} => {
             to_json_binary(&IncomingProxyContract::default().get_origin(deps.storage)?)
         }
-        QueryMsg::GetSourceChannels { start_after, limit } => to_json_binary(
-            &IncomingProxyContract::default().get_source_channels(deps, start_after, limit)?,
+        QueryMsg::GetChannels { start_after, limit } => to_json_binary(
+            &IncomingProxyContract::default().get_channels(deps, start_after, limit)?,
         ),
     }
 }
@@ -77,14 +77,8 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn migrate(deps: DepsMut, _env: Env, msg: MigrateMsg) -> StdResult<Response> {
     match msg {
-        MigrateMsg::WithUpdate {
-            origin,
-            source_channels,
-        } => IncomingProxyContract::default().migrate(
-            deps.storage,
-            deps.api,
-            origin,
-            source_channels,
-        ),
+        MigrateMsg::WithUpdate { origin, channels } => {
+            IncomingProxyContract::default().migrate(deps.storage, deps.api, origin, channels)
+        }
     }
 }

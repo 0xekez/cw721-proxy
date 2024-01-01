@@ -8,15 +8,15 @@ use ics721_types::ibc_types::NonFungibleTokenPacketData;
 use thiserror::Error;
 
 const ORIGIN: Item<Addr> = Item::new("origin");
-const SOURCE_CHANNELS: Map<String, String> = Map::new("source_channels");
+const CHANNELS: Map<String, String> = Map::new("channels");
 
 #[derive(Error, Debug, PartialEq)]
 pub enum IncomingProxyError {
     #[error(transparent)]
     Std(#[from] StdError),
 
-    #[error("Unauthorized source channel: {0}")]
-    UnauthorizedSourceChannel(String),
+    #[error("Unauthorized channel: {0}")]
+    UnauthorizedChannel(String),
 
     #[error("Sender is not origin contract: {0}")]
     UnauthorizedOrigin(String),
@@ -28,14 +28,14 @@ pub trait IncomingProxyExecute {
         storage: &mut dyn Storage,
         api: &dyn Api,
         origin: Option<String>,
-        source_channels: Option<Vec<String>>,
+        channels: Option<Vec<String>>,
     ) -> StdResult<()> {
         if let Some(origin) = origin {
             ORIGIN.save(storage, &api.addr_validate(&origin)?)?;
         }
-        if let Some(source_channels) = source_channels {
-            for source_channel in source_channels {
-                SOURCE_CHANNELS.save(storage, source_channel.clone(), &source_channel)?;
+        if let Some(channels) = channels {
+            for channel in channels {
+                CHANNELS.save(storage, channel.clone(), &channel)?;
             }
         }
         Ok(())
@@ -73,11 +73,11 @@ pub trait IncomingProxyExecute {
         storage: &dyn Storage,
         packet: IbcPacket,
     ) -> Result<(), IncomingProxyError> {
-        if SOURCE_CHANNELS.has(storage, packet.dest.channel_id.clone()) {
+        if CHANNELS.has(storage, packet.dest.channel_id.clone()) {
             return Ok(());
         }
-        Err(IncomingProxyError::UnauthorizedSourceChannel(
-            packet.src.channel_id,
+        Err(IncomingProxyError::UnauthorizedChannel(
+            packet.dest.channel_id,
         ))
     }
 
@@ -86,35 +86,32 @@ pub trait IncomingProxyExecute {
         storage: &mut dyn Storage,
         api: &dyn Api,
         origin: Option<String>,
-        source_channels: Option<Vec<String>>,
+        channels: Option<Vec<String>>,
     ) -> StdResult<Response> {
         if let Some(origin) = origin.clone() {
             ORIGIN.save(storage, &api.addr_validate(&origin)?)?;
         }
-        if let Some(source_channels) = source_channels.clone() {
-            SOURCE_CHANNELS.clear(storage);
-            for source_channel in source_channels {
-                SOURCE_CHANNELS.save(storage, source_channel.clone(), &source_channel)?;
+        if let Some(channels) = channels.clone() {
+            CHANNELS.clear(storage);
+            for channel in channels {
+                CHANNELS.save(storage, channel.clone(), &channel)?;
             }
         }
         Ok(Response::default()
             .add_attribute("method", "migrate")
             .add_attribute("origin", origin.unwrap_or("empty".to_string()))
-            .add_attribute(
-                "source_channels",
-                source_channels.unwrap_or_default().join(","),
-            ))
+            .add_attribute("channels", channels.unwrap_or_default().join(",")))
     }
 }
 
 pub trait IncomingProxyQuery {
-    fn get_source_channels(
+    fn get_channels(
         &self,
         deps: Deps,
         start_after: Option<String>,
         limit: Option<u32>,
     ) -> StdResult<Vec<String>> {
-        paginate_map_keys(deps, &SOURCE_CHANNELS, start_after, limit, Order::Ascending)
+        paginate_map_keys(deps, &CHANNELS, start_after, limit, Order::Ascending)
     }
 
     fn get_origin(&self, storage: &dyn Storage) -> StdResult<Option<Addr>> {

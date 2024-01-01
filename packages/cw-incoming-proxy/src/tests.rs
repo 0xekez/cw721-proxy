@@ -53,10 +53,10 @@ fn test_assert_packet_data() {
         .unwrap_err();
     assert_eq!(
         error,
-        IncomingProxyError::UnauthorizedSourceChannel("channel-0".to_string())
+        IncomingProxyError::UnauthorizedChannel("channel-1".to_string())
     );
 
-    SOURCE_CHANNELS
+    CHANNELS
         .save(
             deps.as_mut().storage,
             "channel-1".to_string(),
