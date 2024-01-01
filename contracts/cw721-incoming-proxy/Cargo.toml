@@ -2,7 +2,7 @@
 name = "cw721-incoming-proxy"
 authors = ["mr-t <mr-t@arkprotocol.io>"]
 edition = "2021"
-version = "0.0.1"
+version = "0.1.0"
 
 [lib]
 crate-type = ["cdylib", "rlib"]

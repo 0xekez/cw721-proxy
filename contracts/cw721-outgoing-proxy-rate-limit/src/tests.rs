@@ -1,8 +1,8 @@
-use cosmwasm_std::{from_json, to_json_binary, Addr, Empty};
+use cosmwasm_std::{from_json, to_json_binary, Addr, Empty, IbcTimeout};
 use cw721::Cw721ReceiveMsg;
 use cw_multi_test::{next_block, App, Contract, ContractWrapper, Executor};
 use cw_rate_limiter::{Rate, RateLimitError};
-use ics721_types::ibc_types::IbcOutgoingProxyMsg;
+use ics721_types::ibc_types::{IbcOutgoingMsg, IbcOutgoingProxyMsg};
 
 use crate::msg::{InstantiateMsg, QueryMsg};
 
@@ -105,13 +105,20 @@ impl Test {
             },
             &[],
         )?;
+
+        let ibc_msg = IbcOutgoingMsg {
+            receiver: "receiver".to_string(),
+            channel_id: "channel".to_string(),
+            timeout: IbcTimeout::with_timestamp(self.app.block_info().time.plus_minutes(30)),
+            memo: None,
+        };
         self.app.execute_contract(
             self.minter.clone(),
             nft.clone(),
             &cw721_base::msg::ExecuteMsg::<Empty, Empty>::SendNft {
                 contract: self.rate_limiter.to_string(),
                 token_id: self.nfts_minted.to_string(),
-                msg: to_json_binary("hello")?,
+                msg: to_json_binary(&ibc_msg)?,
             },
             &[],
         )?;
@@ -135,7 +142,7 @@ impl Test {
                     msg,
                     IbcOutgoingProxyMsg {
                         collection: nft.to_string(),
-                        msg: to_json_binary("hello")?
+                        msg: to_json_binary(&ibc_msg)?
                     }
                 )
             }

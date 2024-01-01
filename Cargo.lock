@@ -476,7 +476,7 @@ dependencies = [
 
 [[package]]
 name = "cw721-incoming-proxy"
-version = "0.0.1"
+version = "0.1.0"
 dependencies = [
  "anyhow",
  "cosmwasm-schema",
@@ -523,7 +523,7 @@ dependencies = [
 
 [[package]]
 name = "cw721-outgoing-proxy-rate-limit"
-version = "0.0.1"
+version = "0.1.0"
 dependencies = [
  "anyhow",
  "cosmwasm-schema",
