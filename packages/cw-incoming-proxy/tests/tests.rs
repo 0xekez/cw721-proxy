@@ -324,7 +324,7 @@ fn test_ics721_receive_packet() {
 
     // test authorized
     {
-        let source_channels = vec!["channel-0".to_string()];
+        let source_channels = vec!["channel-1".to_string()];
         let mut test =
             Ics721IncomingProxyMultiTest::new(ORIGIN_ADDR.to_string(), Some(source_channels));
         test.execute_ics721_receive_packet(

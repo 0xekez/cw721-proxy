@@ -59,8 +59,8 @@ fn test_assert_packet_data() {
     SOURCE_CHANNELS
         .save(
             deps.as_mut().storage,
-            "channel-0".to_string(),
-            &"channel-0".to_string(),
+            "channel-1".to_string(),
+            &"channel-1".to_string(),
         )
         .unwrap();
     IncomingProxyContract::default()
