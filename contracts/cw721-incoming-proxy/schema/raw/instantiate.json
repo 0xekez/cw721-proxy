@@ -3,13 +3,7 @@
   "title": "InstantiateMsg",
   "type": "object",
   "properties": {
-    "origin": {
-      "type": [
-        "string",
-        "null"
-      ]
-    },
-    "source_channels": {
+    "channels": {
       "type": [
         "array",
         "null"
@@ -17,6 +11,12 @@
       "items": {
         "type": "string"
       }
+    },
+    "origin": {
+      "type": [
+        "string",
+        "null"
+      ]
     }
   },
   "additionalProperties": false

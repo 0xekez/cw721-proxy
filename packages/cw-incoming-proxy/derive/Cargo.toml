@@ -1,6 +1,6 @@
 [package]
 name         = "cw-incoming-proxy-derive"
-version      = "0.0.1"
+version      = "0.1.0"
 description  = "Contains `cw_incoming_proxy_execute` and `cw_incoming_proxy_query` macros for generating ICS721 Context-based contracts."
 license      = { workspace = true }
 authors      = { workspace = true }

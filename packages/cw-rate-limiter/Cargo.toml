@@ -3,7 +3,7 @@ name = "cw-rate-limiter"
 license = "BSD-3"
 authors = ["ekez <ekez@withoutdoing.com>"]
 edition = "2021"
-version = "0.0.1"
+version = "0.1.0"
 
 [dependencies]
 cosmwasm-std = { workspace = true }

@@ -3,7 +3,7 @@ name = "cw721-outgoing-proxy"
 license = "BSD-3"
 authors = ["ekez <ekez@withoutdoing.com>", "mr-t <mr-t@arkprotocol.io>"]
 edition = "2021"
-version = "0.0.1"
+version = "0.1.0"
 
 [dependencies]
 cosmwasm-std = { workspace = true }

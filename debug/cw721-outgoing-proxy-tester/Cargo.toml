@@ -1,6 +1,6 @@
 [package]
 name = "cw721-outgoing-proxy-tester"
-version = "0.0.1"
+version = "0.1.0"
 authors = ["ekez <ekez@withoutdoing.com>", "mr-t <mr-t@arkprotocol.io>"]
 edition = "2021"
 description = "a contract for testing cw721 outgoing proxy implementations"
