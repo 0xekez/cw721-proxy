@@ -1,5 +1,5 @@
 {
-  "contract_name": "cw721-outgoing-proxy-rate-limit",
+  "contract_name": "cw-ics721-outgoing-proxy-rate-limit",
   "contract_version": "0.1.0",
   "idl_version": "1.0.0",
   "instantiate": {

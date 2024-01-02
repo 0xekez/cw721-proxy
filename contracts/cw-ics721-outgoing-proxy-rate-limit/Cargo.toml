@@ -1,5 +1,5 @@
 [package]
-name = "cw721-outgoing-proxy-rate-limit"
+name = "cw-ics721-outgoing-proxy-rate-limit"
 license = "BSD-3"
 authors = ["ekez <ekez@withoutdoing.com>"]
 edition = "2021"
