@@ -18,13 +18,13 @@ cw-multi-test = "^0.20"
 cw2 = "^1.1"
 cw721 = "^0.18"
 cw721-base = "^0.18"
+cw-ics721-incoming-proxy = { path = "./packages/cw-ics721-incoming-proxy", version = "*" }
+cw-ics721-incoming-proxy-derive = { path = "./packages/cw-ics721-incoming-proxy-derive", version = "*" }
+cw-ics721-outgoing-proxy = { path = "./packages/cw-ics721-outgoing-proxy", version = "*" }
+cw-ics721-outgoing-proxy-derive = { path = "./packages/cw-ics721-outgoing-proxy-derive", version = "*" }
+cw-ics721-outgoing-proxy-tester = { path = "./debug/cw-ics721-outgoing-proxy-tester", version = "*" }
 cw-paginate-storage = { version = "^2.4", git = "https://github.com/DA0-DA0/dao-contracts.git" }
-cw721-outgoing-proxy = { path = "./packages/cw721-outgoing-proxy", version = "*" }
-cw721-outgoing-proxy-derive = { path = "./packages/cw721-outgoing-proxy-derive", version = "*" }
-cw721-outgoing-proxy-tester = { path = "./debug/cw721-outgoing-proxy-tester", version = "*" }
 cw-rate-limiter = { path = "./packages/cw-rate-limiter", version = "*" }
-cw-incoming-proxy = { path = "./packages/cw-incoming-proxy", version = "*" }
-cw-incoming-proxy-derive = { path = "./packages/cw-incoming-proxy/derive", version = "*" }
 ics721-types = { git = "https://github.com/arkprotocol/ark-cw-ics721", branch = "incoming_proxy", version = "*" } # TODO change to tag once merged to PA repo
 
 quote = "^1.0"

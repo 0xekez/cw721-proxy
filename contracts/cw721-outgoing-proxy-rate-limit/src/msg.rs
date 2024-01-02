@@ -1,6 +1,6 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
 
-use cw721_outgoing_proxy_derive::cw721_receive_nft;
+use cw_ics721_outgoing_proxy_derive::cw721_receive_nft;
 use cw_rate_limiter::Rate;
 
 #[cw_serde]

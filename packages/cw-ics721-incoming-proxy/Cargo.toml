@@ -1,0 +1,20 @@
+[package]
+name = "cw-ics721-incoming-proxy"
+authors = ["mr-t <mr-t@arkprotocol.io>"]
+edition = "2021"
+version = "0.1.0"
+
+[dependencies]
+cosmwasm-std = { workspace = true }
+cosmwasm-schema = { workspace = true }
+cw-ics721-incoming-proxy-derive = { workspace = true }
+cw-paginate-storage = { workspace = true }
+cw-storage-plus = { workspace = true }
+ics721-types = { workspace = true }
+thiserror = { workspace = true }
+schemars = { workspace = true }
+serde = { workspace = true }
+
+[dev-dependencies]
+anyhow = { workspace = true }
+cw-multi-test = { workspace = true }

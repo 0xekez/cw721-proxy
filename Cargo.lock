@@ -224,13 +224,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "cw-incoming-proxy"
+name = "cw-ics721-incoming-proxy"
 version = "0.1.0"
 dependencies = [
  "anyhow",
  "cosmwasm-schema",
  "cosmwasm-std",
- "cw-incoming-proxy-derive",
+ "cw-ics721-incoming-proxy-derive",
  "cw-multi-test",
  "cw-paginate-storage",
  "cw-storage-plus 1.2.0",
@@ -241,14 +241,77 @@ dependencies = [
 ]
 
 [[package]]
-name = "cw-incoming-proxy-derive"
+name = "cw-ics721-incoming-proxy-base"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw-ics721-incoming-proxy",
+ "cw-ics721-incoming-proxy-derive",
+ "cw-ics721-outgoing-proxy",
+ "cw-ics721-outgoing-proxy-derive",
+ "cw-ics721-outgoing-proxy-tester",
+ "cw-multi-test",
+ "cw-storage-plus 1.2.0",
+ "cw2 1.1.2",
+ "cw721 0.18.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "cw721-base 0.18.0",
+ "ics721-types",
+ "rand",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
+name = "cw-ics721-incoming-proxy-derive"
+version = "0.1.0"
+dependencies = [
+ "cosmwasm-schema",
  "cosmwasm-std",
  "ics721-types",
  "proc-macro2",
  "quote",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "cw-ics721-outgoing-proxy"
+version = "0.1.0"
+dependencies = [
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw-ics721-outgoing-proxy-derive",
+ "cw-storage-plus 1.2.0",
+ "cw721 0.18.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "cw721-base 0.18.0",
+ "ics721-types",
+ "thiserror",
+]
+
+[[package]]
+name = "cw-ics721-outgoing-proxy-derive"
+version = "0.1.0"
+dependencies = [
+ "cw721 0.18.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "proc-macro2",
+ "quote",
+ "syn 1.0.109",
+]
+
+[[package]]
+name = "cw-ics721-outgoing-proxy-tester"
+version = "0.1.0"
+dependencies = [
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw-ics721-outgoing-proxy",
+ "cw-ics721-outgoing-proxy-derive",
+ "cw-multi-test",
+ "cw-storage-plus 1.2.0",
+ "cw2 1.1.2",
+ "cw721 0.18.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "thiserror",
 ]
 
 [[package]]
@@ -475,86 +538,24 @@ dependencies = [
 ]
 
 [[package]]
-name = "cw721-incoming-proxy"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "cosmwasm-schema",
- "cosmwasm-std",
- "cw-incoming-proxy",
- "cw-incoming-proxy-derive",
- "cw-multi-test",
- "cw-storage-plus 1.2.0",
- "cw2 1.1.2",
- "cw721 0.18.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "cw721-base 0.18.0",
- "cw721-outgoing-proxy",
- "cw721-outgoing-proxy-derive",
- "cw721-outgoing-proxy-tester",
- "ics721-types",
- "rand",
- "serde",
- "thiserror",
-]
-
-[[package]]
-name = "cw721-outgoing-proxy"
-version = "0.1.0"
-dependencies = [
- "cosmwasm-schema",
- "cosmwasm-std",
- "cw-storage-plus 1.2.0",
- "cw721 0.18.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "cw721-base 0.18.0",
- "cw721-outgoing-proxy-derive",
- "ics721-types",
- "thiserror",
-]
-
-[[package]]
-name = "cw721-outgoing-proxy-derive"
-version = "0.1.0"
-dependencies = [
- "cw721 0.18.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "proc-macro2",
- "quote",
- "syn 1.0.109",
-]
-
-[[package]]
 name = "cw721-outgoing-proxy-rate-limit"
 version = "0.1.0"
 dependencies = [
  "anyhow",
  "cosmwasm-schema",
  "cosmwasm-std",
+ "cw-ics721-outgoing-proxy",
+ "cw-ics721-outgoing-proxy-derive",
+ "cw-ics721-outgoing-proxy-tester",
  "cw-multi-test",
  "cw-rate-limiter",
  "cw-storage-plus 1.2.0",
  "cw2 1.1.2",
  "cw721 0.18.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "cw721-base 0.18.0",
- "cw721-outgoing-proxy",
- "cw721-outgoing-proxy-derive",
- "cw721-outgoing-proxy-tester",
  "ics721-types",
  "rand",
  "serde",
- "thiserror",
-]
-
-[[package]]
-name = "cw721-outgoing-proxy-tester"
-version = "0.1.0"
-dependencies = [
- "cosmwasm-schema",
- "cosmwasm-std",
- "cw-multi-test",
- "cw-storage-plus 1.2.0",
- "cw2 1.1.2",
- "cw721 0.18.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "cw721-outgoing-proxy",
- "cw721-outgoing-proxy-derive",
  "thiserror",
 ]
 

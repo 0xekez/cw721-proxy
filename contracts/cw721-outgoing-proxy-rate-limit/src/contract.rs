@@ -6,7 +6,7 @@ use cosmwasm_std::{
 use cw2::set_contract_version;
 use cw721::Cw721ReceiveMsg;
 
-use cw721_outgoing_proxy::{
+use cw_ics721_outgoing_proxy::{
     execute_receive_nft as cw721_execute_receive_nft, reply as cw721_reply,
 };
 use cw_rate_limiter::{Rate, RateLimitError};

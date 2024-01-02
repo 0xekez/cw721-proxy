@@ -1,7 +1,6 @@
 [package]
-name = "cw721-outgoing-proxy-rate-limit"
-license = "BSD-3"
-authors = ["ekez <ekez@withoutdoing.com>"]
+name = "cw-ics721-incoming-proxy-base"
+authors = ["mr-t <mr-t@arkprotocol.io>"]
 edition = "2021"
 version = "0.1.0"
 
@@ -18,18 +17,19 @@ library = []
 cosmwasm-std = { workspace = true }
 cosmwasm-schema = { workspace = true }
 cw-storage-plus = { workspace = true }
-cw-ics721-outgoing-proxy = { workspace = true }
-cw-ics721-outgoing-proxy-derive = { workspace = true }
-cw-rate-limiter = { workspace = true }
 cw2 = { workspace = true }
 cw721 = { workspace = true }
-cw721-base = { workspace = true, features = [ "library" ] }
+cw-ics721-incoming-proxy  = { workspace = true }
+cw-ics721-incoming-proxy-derive  = { workspace = true }
+cw-ics721-outgoing-proxy = { workspace = true }
+cw-ics721-outgoing-proxy-derive = { workspace = true }
 ics721-types = { workspace = true }
 serde = { workspace = true }
 thiserror = { workspace = true }
 
 [dev-dependencies]
 cw-multi-test = { workspace = true }
+cw721-base = { workspace = true }
 cw-ics721-outgoing-proxy-tester = { workspace = true }
 rand = { workspace = true }
 anyhow = { workspace = true }
