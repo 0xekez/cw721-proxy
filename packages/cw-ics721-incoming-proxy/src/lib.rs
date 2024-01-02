@@ -99,8 +99,11 @@ pub trait IncomingProxyExecute {
         }
         Ok(Response::default()
             .add_attribute("method", "migrate")
-            .add_attribute("origin", origin.unwrap_or("empty".to_string()))
-            .add_attribute("channels", channels.unwrap_or_default().join(",")))
+            .add_attribute("origin", origin.unwrap_or("not migrated".to_string()))
+            .add_attribute(
+                "channels",
+                channels.map_or("not migrated".to_string(), |v| v.join(",")),
+            ))
     }
 }
 
