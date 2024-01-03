@@ -737,7 +737,7 @@ dependencies = [
 [[package]]
 name = "ics721-types"
 version = "0.1.0"
-source = "git+https://github.com/arkprotocol/ark-cw-ics721?branch=incoming_proxy#3ec3ed5a233de9f2555f0b1b041b99c756c336f2"
+source = "git+https://github.com/public-awesome/cw-ics721?tag=v0.1.5#f1dfefc71c3ace567a5b79e98100ee17d9cfcc5d"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",
@@ -952,9 +952,9 @@ dependencies = [
 
 [[package]]
 name = "semver"
-version = "1.0.20"
+version = "1.0.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "836fa6a3e1e547f9a2c4040802ec865b5d85f4014efe00555d7090a3dcaa1090"
+checksum = "b97ed7a9823b74f99c7742f5336af7be5ecd3eeafcb1507d1fa93347b1d589b0"
 
 [[package]]
 name = "serde"
