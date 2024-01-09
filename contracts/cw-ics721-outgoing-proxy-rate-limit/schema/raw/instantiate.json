@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "InstantiateMsg",
+  "type": "object",
+  "required": [
+    "rate_limit"
+  ],
+  "properties": {
+    "origin": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "rate_limit": {
+      "$ref": "#/definitions/Rate"
+    }
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "Rate": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "per_block"
+          ],
+          "properties": {
+            "per_block": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0.0
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "blocks"
+          ],
+          "properties": {
+            "blocks": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0.0
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}

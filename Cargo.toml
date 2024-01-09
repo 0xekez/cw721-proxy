@@ -1,6 +1,40 @@
 [workspace]
 members = ["contracts/*", "packages/*", "debug/*"]
 
+[workspace.package]
+authors = ["mr-t <mr-t@arkprotocol.io>"]
+edition    = "2021"
+homepage   = "https://arkprotocol.io"
+repository = "https://github.com/arkprotocol/cw721-proxy/"
+license   = "Apache-2.0"
+keywords   = ["cosmos", "cosmwasm"]
+
+[workspace.dependencies]
+anyhow = "^1.0"
+cosmwasm-std = "^1.5"
+cosmwasm-schema = "^1.5"
+cw-storage-plus = "^1.2"
+cw-multi-test = "^0.20"
+cw2 = "^1.1"
+cw721 = "^0.18"
+cw721-base = "^0.18"
+cw-ics721-incoming-proxy = { path = "./packages/cw-ics721-incoming-proxy", version = "*" }
+cw-ics721-incoming-proxy-derive = { path = "./packages/cw-ics721-incoming-proxy-derive", version = "*" }
+cw-ics721-outgoing-proxy = { path = "./packages/cw-ics721-outgoing-proxy", version = "*" }
+cw-ics721-outgoing-proxy-derive = { path = "./packages/cw-ics721-outgoing-proxy-derive", version = "*" }
+cw-ics721-outgoing-proxy-tester = { path = "./debug/cw-ics721-outgoing-proxy-tester", version = "*" }
+cw-paginate-storage = { version = "^2.4", git = "https://github.com/DA0-DA0/dao-contracts.git" }
+cw-rate-limiter = { path = "./packages/cw-rate-limiter", version = "*" }
+ics721-types = { git = "https://github.com/public-awesome/cw-ics721", tag = "v0.1.5" }
+
+quote = "^1.0"
+rand = "^0.8"
+syn = "^1.0"
+schemars = "^0.8"
+serde = "^1.0"
+thiserror = "^1.0"
+proc-macro2 = "^1.0"
+
 [profile.release]
 codegen-units = 1
 opt-level = 3

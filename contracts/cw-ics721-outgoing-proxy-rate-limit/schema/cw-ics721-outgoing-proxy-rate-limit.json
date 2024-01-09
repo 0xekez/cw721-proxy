@@ -1,0 +1,180 @@
+{
+  "contract_name": "cw-ics721-outgoing-proxy-rate-limit",
+  "contract_version": "0.1.0",
+  "idl_version": "1.0.0",
+  "instantiate": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "InstantiateMsg",
+    "type": "object",
+    "required": [
+      "rate_limit"
+    ],
+    "properties": {
+      "origin": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "rate_limit": {
+        "$ref": "#/definitions/Rate"
+      }
+    },
+    "additionalProperties": false,
+    "definitions": {
+      "Rate": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "per_block"
+            ],
+            "properties": {
+              "per_block": {
+                "type": "integer",
+                "format": "uint64",
+                "minimum": 0.0
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": [
+              "blocks"
+            ],
+            "properties": {
+              "blocks": {
+                "type": "integer",
+                "format": "uint64",
+                "minimum": 0.0
+              }
+            },
+            "additionalProperties": false
+          }
+        ]
+      }
+    }
+  },
+  "execute": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "ExecuteMsg",
+    "oneOf": [
+      {
+        "type": "object",
+        "required": [
+          "receive_nft"
+        ],
+        "properties": {
+          "receive_nft": {
+            "$ref": "#/definitions/Cw721ReceiveMsg"
+          }
+        },
+        "additionalProperties": false
+      }
+    ],
+    "definitions": {
+      "Binary": {
+        "description": "Binary is a wrapper around Vec<u8> to add base64 de/serialization with serde. It also adds some helper methods to help encode inline.\n\nThis is only needed as serde-json-{core,wasm} has a horrible encoding for Vec<u8>. See also <https://github.com/CosmWasm/cosmwasm/blob/main/docs/MESSAGE_TYPES.md>.",
+        "type": "string"
+      },
+      "Cw721ReceiveMsg": {
+        "description": "Cw721ReceiveMsg should be de/serialized under `Receive()` variant in a ExecuteMsg",
+        "type": "object",
+        "required": [
+          "msg",
+          "sender",
+          "token_id"
+        ],
+        "properties": {
+          "msg": {
+            "$ref": "#/definitions/Binary"
+          },
+          "sender": {
+            "type": "string"
+          },
+          "token_id": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "query": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "QueryMsg",
+    "oneOf": [
+      {
+        "description": "Gets the contract's rate limit.",
+        "type": "object",
+        "required": [
+          "rate_limit"
+        ],
+        "properties": {
+          "rate_limit": {
+            "type": "object",
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "required": [
+          "origin"
+        ],
+        "properties": {
+          "origin": {
+            "type": "object",
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
+    ]
+  },
+  "migrate": null,
+  "sudo": null,
+  "responses": {
+    "origin": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "String",
+      "type": "string"
+    },
+    "rate_limit": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Rate",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "per_block"
+          ],
+          "properties": {
+            "per_block": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0.0
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "blocks"
+          ],
+          "properties": {
+            "blocks": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0.0
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}
