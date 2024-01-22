@@ -34,7 +34,7 @@ pub fn instantiate(
     Ok(Response::default()
         .add_attribute("method", "instantiate")
         .add_attribute(
-            "orgin",
+            "origin",
             msg.origin.map_or("empty".to_string(), |o| o.to_string()),
         )
         .add_attribute(
